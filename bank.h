@@ -5,9 +5,17 @@
 #include <map>
 #include <vector> 
 #include <string.h>
-//using namespace std::map;
+#include <stdlib.h>
+
+using namespace std
 //using namespace std::vector ; 
 
+#define BANLK_ACCOUNT_NUM 987889898
+#define BANLK_ACCOUNT_PASS 959595320
+
+#define SUCCESS 0 ;
+#define PASS_ERROR -1
+#define NEG_ERROR -2 
 
 
 class bank
@@ -21,10 +29,14 @@ class bank
 		
 		void print_status () ;
 		
+		
 		friend class atm ; //i need the atm to access the acoounts of the bank
 		
+		friend void bank_main_loop();
+		
+		friend void bank_print_loop();
 	private:
-		int atm_id_ ;
+		//int atm_id_ ;
 		map<unsigned int,account*> bank_accounts_ ;
 		vector<atm*> atms_vector ;
 		//vector<pthread_t*> atms_threads ;

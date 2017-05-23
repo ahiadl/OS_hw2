@@ -7,10 +7,11 @@
 
 //*******************************************************************************************************//
 
-	atm::atm (bank *associated_bank , pthread_t atm_id )
+	atm::atm (bank *associated_bank ,int id_num, pthread_t atm_id )
 	{
 		associated_bank_ = associated_bank;
 		atm_id_ = atm_id;
+		id_num_ = id_num;
 		pthread_mutex_init(&atm_mutex_ , NULL) ;
 	}
 	
@@ -30,11 +31,11 @@
 	
 //*******************************************************************************************************//
 	
-	string atm_open_account (unsigned int account_num , string password , unsigned int balance);
+	void atm_open_account (unsigned int account_num , string password , unsigned int balance);
 	{
 		pthread_mutex_lock(&atm_mutex_);
 		
-		string log;
+		
 		account* new_account = account::account(account_num, password, balance);
 		associated_bank_::bank_accounts_.insert(account_num, &new_account) ; 
 		//todo: get log massage and return it;
@@ -44,57 +45,99 @@
 
 //*******************************************************************************************************//
 	
-	string atm_deposit (unsigned int account_num , string password , unsigned int amount); 
+	void atm_deposit (unsigned int account_num , string password , unsigned int amount); 
 	{	
 		pthread_mutex_lock(&atm_mutex_);
 		
-		string log
-		&account_reff = associated_bank_::bank_accounts_.find(account_num) ; //get pointer for the account--need allocation ?
-		account_reff.account_deposit(password,amount);
-		//todo: get log massage and return it;
 		
+		account_reff = associated_bank_::bank_accounts_.find(account_num) ; //get pointer for the account
+		if(account_reff == associated_bank_::bank_accounts_.end()) // cant find account id
+		{
+			printf("Error %d: Your transaction failed – account id %d does not exist\n",id_num_,account_num);
+		}
+		else
+		{	
+			int new_balance = account_reff.account_deposit(password,amount);
+			if(new_balance==PASS_ERROR);
+			{
+				printf("Error %d: Your transaction failed – password for account id %d is incorrect\n",id_num_,account_num);
+			}
+			else 
+			{
+				printf("%d: Account %d new balance is %d after %d $ was deposited)\n",id_num_,account_num,new_balance,amount);
+			}
+		}
 		pthread_mutex_unlock(&atm_mutex_);
 	}
 
 //*******************************************************************************************************//
 	
-	string atm_withdraw (unsigned int account_num , string password , unsigned int amount); 
+	void atm_withdraw (unsigned int account_num , string password , unsigned int amount); 
 	{
 		pthread_mutex_lock(&atm_mutex_);
 		
-		string log;
-		&account_reff = associated_bank_::bank_accounts_.find(account_num) ; //get pointer for the account--need allocation ?
-		account_reff.account_withdraw(password,amount);
-		//todo: get log massage and return it;
 		
+		account_reff = associated_bank_::bank_accounts_.find(account_num) ; //get pointer for the account
+		if(account_reff == associated_bank_::bank_accounts_.end()) // cant find account id
+		{
+			printf("Error %d: Your transaction failed – account id %d does not exist",id_num_,account_num);
+		}
+		else
+		{	
+			int new_balance = account_reff.account_withdraw(password,amount);
+			if(new_balance==PASS_ERROR);
+			{
+				printf("Error %d: Your transaction failed – password for account id %d is incorrect\n",id_num_,account_num);
+			}
+			else if(new_balance == NEG_ERROR)
+			{
+				printf("Error %d: Your transaction failed – account id %d balance is lower than %d",id_num_,account_nu,amount);
+			}
+			else
+			{
+				printf("%d: Account %d new balance is %d after %d $ was withdrew\n",id_num_,account_num,new_balance,amount);
+			}
+		}
 		pthread_mutex_unlock(&atm_mutex_);
 	}
 
 //*******************************************************************************************************//
 	
-	string atm_get_balance (unsigned int account_num , string password); 
+	void atm_get_balance (unsigned int account_num , string password); 
 	{	
 		pthread_mutex_lock(&atm_mutex_);
 		
-		string log;
-		&account_reff = associated_bank_::bank_accounts_.find(account_num) ; //get pointer for the account--need allocation ?
-		account_reff.account_get_balance(password);
-		//todo: get log massage and return it;
 		
+		account_reff = associated_bank_::bank_accounts_.find(account_num) ; //get pointer for the account
+		if(account_reff == associated_bank_::bank_accounts_.end()) // cant find account id
+		{
+			printf("Error %d: Your transaction failed – account id %d does not exist",id_num_,account_num);
+		}
+		else
+		{	
+			account_reff.account_get_balance(password);
+		//todo: get log massage and return it;
+		}
 		pthread_mutex_unlock(&atm_mutex_);
 	}
 //*******************************************************************************************************//
 	
 	//verifay password and call to the account d'tor 
-	string atm_close_account (unsigned int account_num , string password); 
+	void atm_close_account (unsigned int account_num , string password); 
 	{	
 		pthread_mutex_lock(&atm_mutex_);
 		
-		string log;
-		&account_reff = associated_bank_::bank_accounts_.find(account_num) ; //get referance pointer to account--need allocation ?
-		account_reff.account_close(password);
-		//todo: get log massage and return it;
 		
+		account_reff = associated_bank_::bank_accounts_.find(account_num) ; //get pointer for the account
+		if(account_reff == associated_bank_::bank_accounts_.end()) // cant find account id
+		{
+			printf("Error %d: Your transaction failed – account id %d does not exist",id_num_,account_num);
+		}
+		else
+		{	
+			account_reff.account_close(password);
+		//todo: get log massage and return it;
+		}
 		pthread_mutex_unlock(&atm_mutex_);
 	}
 

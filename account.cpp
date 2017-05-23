@@ -31,12 +31,11 @@
 				
 //**********************************************************************************************************//		
 
-	string account::account_deposit (ustring password , unsigned int amount); 
+	int account::account_deposit (ustring password , unsigned int amount); 
 	{
-		string log;
 		if(strcmp(password_ , password) != 0) //bad password
 		{
-			  //todo: handle wrong password case and log massage.
+			  return PASS_ERROR;.
 		}		
 		else   // password match 
 		{
@@ -46,17 +45,16 @@
 			//todo : handle log massage
 			sem_post(sem_write)	;
 		}
-		return log;
+		return this.balance_;
 	}
 				
 //**********************************************************************************************************//		
  
-	string account::account_withdraw (string password , unsigned int amount); 
+	int account::account_withdraw (string password , unsigned int amount); 
 	{
-		string log ;
 		if(strcmp(password_ , password) != 0) // bad password 
 		{
-			  //todo: handle wrong password case and log massage.
+			  return PASS_ERROR;
 		}
 		else   // password match
 		{
@@ -64,9 +62,9 @@
 			usleep(1e6);
 			if ( amount > this.balance_) // illegal withdraw
 			{
-				//todo: handle illegal withdraw case 
-				//todo: handle log massage ; 
+				//todo: handle illegal withdraw case;
 				sem_post(sem_write);
+				return NEG_ERROR;
 			}
 			else
 			{	
@@ -76,17 +74,17 @@
 				
 			}
 		}
-	return log ;	
+	return this.balance_ ;	
 	}
 	
 //**********************************************************************************************************//		
  
-	string account::account_get_balance (string password)
+	int account::account_get_balance (string password)
 	{	
-		string log ; 
+		//string log ; 
 		if(password_ != password) //todo : bad password, handle this case  
 		{
-			 //todo: handle wrong password case and log massage. 
+			 return PASS_ERROR;
 		}
 		else   // password match
 		{	
@@ -96,27 +94,27 @@
 				sem_trywait(sem_write);   // we dont allow any reader if we need to write .
 			sem_post(sem_read);
 			
+			int cur_balance = this.balance_ ;
 			usleep(1e6);
-			//todo: "read" (get the balance_ to log) --we can return it as astring and atoi[] it.
 			
 			sem_wait(sem_read) ;
 			readers_count_ -- ;
 			if(readers_count_ == 0)
 				sem_post(sem_write);   // we dont allow any reader if we need to write.
 			sem_post(sem_read);
-			
+			return cur_balance;
 			
 		}
-	return log
+	
 	}	
 //**********************************************************************************************************//		
 
-	 string account::account_close (string password)
+	 int account::account_close (string password)
 	 {
-		string log;
+	
 		if(strcmp(password_ , password) != 0) //bad password
 		{
-			  //todo: handle wrong password case and log massage.
+			  return PASS_ERROR;
 		}		
 		else   // password match 
 		{
@@ -125,21 +123,20 @@
 			sem_destroy(sem_write);
 			sem_destroy(sem_read);
 		}
-		return log;
+		return SUCCESS;
 	 }
  
  //**********************************************************************************************************//	
  
-	string account::account_get_money (unsigned int amount)
+	int account::account_get_money (unsigned int amount)
 	{	
 	//this method are used for atm transfer money -- the target account don't need password
-		string log;
+		
 		sem_wait(sem_write);
 		usleep(1e6);
 		this.balance_ += amount ; 
-		//todo : handle log massage
 		sem_post(sem_write)	;
-		return log;
+		return this.balance_;
 	}
  
  

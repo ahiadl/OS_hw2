@@ -11,25 +11,26 @@ using namespace std::string;
 class account
 {
 	public:
-		account (unsigned int account_num , string password , unsigned int balance);
+		account (unsigned int account_num , string password , int balance);
 		
 		~account();
 		
-		string account_deposit (string password , unsigned int amount); 
+		int account_deposit (string password , unsigned int amount); 
 		
-		string account_withdraw (string password , unsigned int amount); 
+		int account_withdraw (string password , unsigned int amount); 
 		
-		string account_get_balance (string password);
+		int account_get_balance (string password);
 		
-		string account_close (string password);
+		int account_close (string password);
 		
-		string account_get_money (); 
+		int account_get_money (unsigned int amount); 
 		
+		friend class bank; //the private bank account access direct ti the acouunts methids
 		
 	private:
 		unsigned int account_num_ ;
 		string password_ ;
-		unsigned int balance_ ;
+		int balance_ ;
 		
 		sem_t *sem_write ;
 		sem_t *sem_read ;

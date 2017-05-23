@@ -18,7 +18,7 @@ int main (int argc, char const argv[])
 	pthread_t atmsThreads[numOfATMs];
 	pthread_t bankThreads[2]; //for example - i need dedicated thread for taking commison 
 
-    bank bank(int atm_number, pthread_t *atms_threads,pthread_t *bank_operations) 
+    bank bank(atm_number, *atms_threads, *bank_operations) 
 
     int numOfAtm = atoi(argv[0]);
     int currentAtm;
