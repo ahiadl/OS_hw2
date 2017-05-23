@@ -1,6 +1,7 @@
-#include <bank.h>
+#include "bank.h"
 #include <stdio.h>
 #include <string.h>
+
 
 #define BANK_THREADS 2
 
@@ -8,11 +9,11 @@ int main (int argc, char const* argv[])
 {
     if (argv == NULL){
         cout << "Illegal Arguments";
-        return;
+        return -1;
     }
     if (argc-1 !=  atoi(*argv[0])){
         cout <<"Illegal Arguments";
-        return;
+        return -1;
     }
 
 	pthread_t atmsThreads[numOfATMs];

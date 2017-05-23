@@ -3,7 +3,8 @@
 #ifndef atm_H_
 #define atm_H_
 #include "bank.h"
-#include<string.h>
+#include <string>
+using std::string ;
 
 #define MAX_LINE_SIZE 256
 
@@ -25,7 +26,7 @@ class atm
 		
 		~atm () ; //d'tor
 		
-		void atm_open_account (unsigned int account_num , string password , unsigned int balance);
+		void atm_open_account (unsigned int account_num , string password , int balance);
 		
 		void atm_deposit (unsigned int account_num , string password , unsigned int amount); 
 		
@@ -39,13 +40,13 @@ class atm
 		//thie method using account methods to transfer the money. 
 		void atm_transfer_money (unsigned int source_account , string password ,unsigned int target_account, unsigned int amount); 
 		
-		
+		friend class bank ;
 	private:
 		bank *associated_bank_ ;
 		pthread_t atm_id_ ;
 		int id_num_;
 		pthread_mutex_t *atm_mutex_ ; //indicate that this atm is in use and unavilibale for new operation.
 	
-}
+};
 
 #endif

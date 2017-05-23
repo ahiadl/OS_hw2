@@ -4,11 +4,22 @@
 #define bank_H_
 #include <map>
 #include <vector> 
-#include <string.h>
+#include <string>
 #include <stdlib.h>
+#include <cstring>
+#include <stdio.h>
+#include "account.h"
+#include "atm.h"
+#include <pthread.h>
+#include <semaphore.h>
+#include <unistd.h>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
-using namespace std
-//using namespace std::vector ; 
+using std::cout;
+using std::map ;
+using std::vector ;
 
 #define BANLK_ACCOUNT_NUM 987889898
 #define BANLK_ACCOUNT_PASS 959595320
@@ -41,7 +52,7 @@ class bank
 		vector<atm*> atms_vector ;
 		//vector<pthread_t*> atms_threads ;
 		account bank_account_ ;
-}
+};
 
 # endif 
 

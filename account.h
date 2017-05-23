@@ -6,7 +6,7 @@
 #include <string.h>
 #include <pthread.h>
 
-using namespace std::string;
+using namespace std;
 
 class account
 {
@@ -15,9 +15,9 @@ class account
 		
 		~account();
 		
-		int account_deposit (string password , unsigned int amount); 
+		int account_deposit (string password ,unsigned int amount);
 		
-		int account_withdraw (string password , unsigned int amount); 
+		int account_withdraw (string password ,unsigned int amount);
 		
 		int account_get_balance (string password);
 		
@@ -37,7 +37,7 @@ class account
 		//pthread_mutex_t *mutex_access ;  //critical section mutex 
 		int readers_count_ ;
 		
-}
+};
 
 #endif 
 		

@@ -4,14 +4,14 @@
 
 
 
-	account::account (unsigned int account_num , string password , unsigned int balance)
+	account::account (unsigned int account_num , string password ,int balance)
 	{
 		account_num_ = account_num ;
-		strcpy(password_ , password) ;  
+		password_  = password ;
 		balance_ = balance ;
 		sem_init(sem_write,1,1) ;
 		sem_init(sem_read,1,1) ;
-		pthread_mutex_init(&mutex_crit, NULL)(sem_queue,1,1) ;
+		//pthread_mutex_init(&mutex_crit, NULL);//(sem_queue,1,1) ;
 		readers_count_ = 0 ;
 		
 	}
@@ -31,7 +31,7 @@
 				
 //**********************************************************************************************************//		
 
-	int account::account_deposit (ustring password , unsigned int amount); 
+	int account::account_deposit (string password , unsigned int amount);
 	{
 		if(strcmp(password_ , password) != 0) //bad password
 		{
@@ -50,9 +50,9 @@
 				
 //**********************************************************************************************************//		
  
-	int account::account_withdraw (string password , unsigned int amount); 
+	int account::account_withdraw (string password , int amount);
 	{
-		if(strcmp(password_ , password) != 0) // bad password 
+		if (password_ != password)  // bad password
 		{
 			  return PASS_ERROR;
 		}
@@ -68,13 +68,13 @@
 			}
 			else
 			{	
-				this.balance_ -= amount ;
+				balance_ -= amount ;
 				//todo: handle log ; 
 				sem_post(sem_write);
 				
 			}
 		}
-	return this.balance_ ;	
+	return balance_ ;
 	}
 	
 //**********************************************************************************************************//		
@@ -134,11 +134,10 @@
 		
 		sem_wait(sem_write);
 		usleep(1e6);
-		this.balance_ += amount ; 
+		balance_ += amount ;
 		sem_post(sem_write)	;
-		return this.balance_;
+		return balance_;
 	}
- 
  
  
  

@@ -10,10 +10,10 @@ void bank_main_loop()
 	while(1) // todo: i need to use here mutex/semaphores ?? 
 	{
 		sleep(3)
-		for (bank_accounts_::iterator it = bank_accounts_.begin(); it != bank_accounts_.end(); ++it)
+		for (bank_accounts_::iterator it = bank::bank_accounts_.begin(); it != bank::bank_accounts_.end(); ++it)
 		{	
 			int cur_acount_num = it->first 			 //account id (int)
-			account* cur_acount = it->second		//account pointer (pointer)
+			account cur_acount = it->second		//account pointer (pointer)
 			string cur_acount_pass = cur_acount.password_ 
 			int cur_balance = cur_acount.account_get_balance(cur_acount_pass);
 			
@@ -36,10 +36,10 @@ void bank_print_loop()
 	{
 		sleep(0.5)
 		printf("Current Bank Status\n");
-		for (bank_accounts_::iterator it = bank_accounts_.begin(); it != bank_accounts_.end(); ++it)
+		for (bank_accounts_::iterator it = bank::bank_accounts_.begin(); it != bank::bank_accounts_.end(); ++it)
 		{	
 			int cur_acount_num = it->first ;		 //account id (int)
-			account* cur_acount = it->second ;		//account pointer (pointer)
+			account cur_acount = it->second ;		//account pointer (pointer)
 			string cur_acount_pass = cur_acount.password_ ;
 			int cur_balance = cur_acount.account_get_balance(cur_acount_pass);
 			
