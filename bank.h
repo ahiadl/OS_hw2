@@ -2,11 +2,11 @@
 
 #ifndef bank_H_
 #define bank_H_
-#include<map>
-#include<vector> 
-
-using namespace std::map;
-using namespace std::vector ; 
+#include <map>
+#include <vector> 
+#include <string.h>
+//using namespace std::map;
+//using namespace std::vector ; 
 
 
 
@@ -17,7 +17,7 @@ class bank
 		
 		~bank();
 		
-		string take_commision (); 
+		char* take_commision (); 
 		
 		void print_status () ;
 		

@@ -1,13 +1,49 @@
-//main.c
-#include<bank.h>
+#include <bank.h>
+#include <stdio.h>
+#include <string.h>
 
-int main ()
+#define BANK_THREADS 2
+
+int main (int argc, char const argv[])
 {
-	//todo: handle all the input files and params
-	
-	pthread_t atms_threads[numOfATMs];
-	pthread_t bank_operations[2]; //for example - i need dedicated thread for taking commison 
-	bank bank(int atm_number, pthread_t *atms_threads,pthread_t *bank_operations) 
-	
-	//todo: the threads should be in the main , or could
+    if (argv == NULL){
+        cout << "Illegal Arguments";
+        return;
+    }
+    if (argc-1 !=  atoi(argv[0])){
+        cout <<"Illegal Arguments";
+        return;
+    }
+
+	pthread_t atmsThreads[numOfATMs];
+	pthread_t bankThreads[2]; //for example - i need dedicated thread for taking commison 
+
+    bank bank(int atm_number, pthread_t *atms_threads,pthread_t *bank_operations) 
+
+    int numOfAtm = atoi(argv[0]);
+    int currentAtm;
+    for (currentAtm = 0; currentAtm < numOfAtm; currentAtm++){
+        rc = pthread_create(&atms_threads[currentAtm], NULL, atm_main_loop, argv[currentAtm]);
+        if (rc){
+            cout << "ERROR creating ATM " << currentAtm << " thread";
+            exit(-1);
+        }
+    }
+    rc = pthread_create(&bankThreads[0], NULL, /*what is the function*/, /*what are the arguments?*/ );
+    if(rc){
+        cout << "ERROR creating bank";
+        exit(-1);
+    }
+    rc = pthread_create(&bankThreads[0], NULL, /*what is the finction*/, /*what are the arguments?*/ );
+    if(rc){
+        cout << "ERROR creating bank";
+        exit(-1);
+    }
+
+    int atmWait, bankWait ;     
+    for (atmWait = 0; atmWait < numOfAtm+2; atmWait++)
+       pthread_join(atmThreads[atmWait],NULL); 
+    for (bankWait = 0; bankWait < numOfAtm+2; bankWait++)
+       pthread_join(bankThreads[bankWait],NULL); 
+    return 0; 
 }

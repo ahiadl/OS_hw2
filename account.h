@@ -1,11 +1,10 @@
 //account.h
 
-#ifnef account_H_
+#ifndef account_H_
 #define account_H_
-#include <atm.h>
+#include "atm.h"
 #include <string.h>
-#include <semaphore.h>
-#include <mutex.h>
+#include <pthread.h>
 
 using namespace std::string;
 
