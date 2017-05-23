@@ -5,6 +5,15 @@
 #include "bank.h"
 #include<string.h>
 
+#define MAX_LINE_SIZE 256
+
+
+enum {
+    WRONG_PASSWORD = -1,
+    ACCOUNT_NOT_EXIST = -2,
+    AMOUNT_ILLEGAL =-3,
+}
+
 using namespace std;
 
 class atm 

@@ -5,6 +5,75 @@
 //!!!! todo: i need t understand how the input gotten by the bank and deliverd to the atm 
 //may be class of argument that the bank handle ?
 
+void printError(int error_code, int atm_id, int account, int bal, int amount){
+    switch(error_code){
+        case WRONG_PASSWORD:
+            printf("Error %d: Your transaction failed – account id %d does not exist\n",atm_id, account);
+            break;
+        case ACCOUNT_NOT_EXIST:
+            printf("Error %d: Your transaction failed – no account with id %d exists",account);        
+            break;
+        case  MOUNT_ILLEGAL:
+            printf("Error %d: Your transaction failed – account id %d balance is lower than %d",atm_id,account,amount);
+            break;
+        casr ACCOUNT_ALRDY_EXIST:
+            printf("Error %d: Your transaction failed – account with the same id exists",atm_id);
+            break;
+        default: break;
+    }
+}
+
+
+
+const vector<string> breakStr (const char* src, const char& delim){
+    char* token = std::strtok(src, delim);
+    vector<string> brokenStr;
+    int i = 0;
+    while(token != NULL){
+        brokenStri.push_back(token);
+        i++;
+        token = std::strtok(NULL, delim);
+    }
+    return brokenStr;
+}
+
+
+void atm_main_loop(int atmNum, pBank bank,char const actionFile){
+    atm atminst(bank,atmNum);
+    std::string act;
+    vector<string> lineParam;
+    FILE* file = fopen(actionFile, "r")
+    while(fgets(act, MAX_LINE_SIZE, file){
+            lineParam = breakStr(act, " ");
+            int account_num = std::stoi(lineParam[1]);
+            int password = std::stoi (lineParam[2]));
+            switch (lineParam[0]){
+                case "O":
+                    atm_open_account(account_num ,  password , std::stoi(lineParam[3]));
+                    break;
+                case "D":
+                    atm_deposit (account_num, password, std::stoi(lineParam[3]));
+                    break;
+                case "W":
+                    atm_withdraw (account_num, password, std::stoi(lineParam[3]));
+                    break;
+                case "B":
+                    atm_get_balance (account_num, password);
+                    break;
+                case "Q":
+                    atm_close_account(account_num, password);
+                    break;
+                case "T":
+                    atm_transfer_money (account_num, password, std::stoi(lineParam[3]), std::stoi(lineParam[4]));
+                    break;
+                default: break;
+            }
+            usleep(100000);
+    }
+    fclose(file);  
+}
+
+
 //*******************************************************************************************************//
 
 	atm::atm (bank *associated_bank ,int id_num, pthread_t atm_id )

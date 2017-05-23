@@ -4,13 +4,13 @@
 
 #define BANK_THREADS 2
 
-int main (int argc, char const argv[])
+int main (int argc, char const* argv[])
 {
     if (argv == NULL){
         cout << "Illegal Arguments";
         return;
     }
-    if (argc-1 !=  atoi(argv[0])){
+    if (argc-1 !=  atoi(*argv[0])){
         cout <<"Illegal Arguments";
         return;
     }
@@ -18,8 +18,8 @@ int main (int argc, char const argv[])
 	pthread_t atmsThreads[numOfATMs];
 	pthread_t bankThreads[2]; //for example - i need dedicated thread for taking commison 
 
-    bank bank(atm_number, *atms_threads, *bank_operations) 
-
+    bank bank(atm_number,*atmsThreads, *bankThreads); 
+    
     int numOfAtm = atoi(argv[0]);
     int currentAtm;
     for (currentAtm = 0; currentAtm < numOfAtm; currentAtm++){
@@ -29,21 +29,21 @@ int main (int argc, char const argv[])
             exit(-1);
         }
     }
-    rc = pthread_create(&bankThreads[0], NULL, /*what is the function*/, /*what are the arguments?*/ );
+    rc = pthread_create(&bankThreads[0], NULL, bank_main_loop, bank);
     if(rc){
         cout << "ERROR creating bank";
         exit(-1);
     }
-    rc = pthread_create(&bankThreads[0], NULL, /*what is the finction*/, /*what are the arguments?*/ );
+    rc = pthread_create(&bankThreads[0], NULL, bank_print_loop,bank);
     if(rc){
         cout << "ERROR creating bank";
         exit(-1);
     }
 
-    int atmWait, bankWait ;     
+    int atmWait;     
     for (atmWait = 0; atmWait < numOfAtm+2; atmWait++)
        pthread_join(atmThreads[atmWait],NULL); 
-    for (bankWait = 0; bankWait < numOfAtm+2; bankWait++)
-       pthread_join(bankThreads[bankWait],NULL); 
+    pthread_join(bankThreads[0],NULL); 
+    pthread_exit(bankThreads[0]);
     return 0; 
 }
