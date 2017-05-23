@@ -2,14 +2,16 @@
 
 #ifndef bank_H_
 #define bank_H_
+#include "account.h"
+#include "atm.h"
+
 #include <map>
 #include <vector> 
 #include <string>
 #include <stdlib.h>
 #include <cstring>
 #include <stdio.h>
-#include "account.h"
-#include "atm.h"
+
 #include <pthread.h>
 #include <semaphore.h>
 #include <unistd.h>
@@ -28,6 +30,9 @@ using std::vector ;
 #define PASS_ERROR -1
 #define NEG_ERROR -2 
 
+//forward declaration
+class atm;
+class account ;
 
 class bank
 {

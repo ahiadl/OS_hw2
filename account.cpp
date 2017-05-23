@@ -94,7 +94,7 @@
 				sem_trywait(sem_write);   // we dont allow any reader if we need to write .
 			sem_post(sem_read);
 			
-			int cur_balance = this.balance_ ;
+			int cur_balance = balance_ ;
 			usleep(1e6);
 			
 			sem_wait(sem_read) ;

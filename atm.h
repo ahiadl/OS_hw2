@@ -15,7 +15,6 @@ enum {
     AMOUNT_ILLEGAL =-3,
 }
 
-using namespace std;
 
 class atm 
 {
