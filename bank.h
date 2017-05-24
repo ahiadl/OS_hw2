@@ -17,7 +17,7 @@ class bank
 		
 		~bank();
 		
-		char* take_commision (); 
+		void take_commision ();
 		
 		void print_status () ;
 		
@@ -30,6 +30,7 @@ class bank
 	private:
 		//int atm_id_ ;
 		map<unsigned int,account*> bank_accounts_ ;
+		map<unsigned int,account*>::iterator accounts_it ;
 		vector<atm*> atms_vector ;
 		//vector<pthread_t*> atms_threads ;
 		account bank_account_ ;

@@ -28,6 +28,7 @@ using std::cout;
 using std::map ;
 using std::vector ;
 using std::string ;
+using std::pair ;
 
 #define BANLK_ACCOUNT_NUM 987889898
 #define BANLK_ACCOUNT_PASS 959595320

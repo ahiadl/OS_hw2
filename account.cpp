@@ -116,7 +116,7 @@
 			  return PASS_ERROR;
 		}		
 		else   // password match 
-		{
+		{   //todo: remove from accounts map
 			sem_close(sem_write);
 			sem_close(sem_read);
 			sem_destroy(sem_write);

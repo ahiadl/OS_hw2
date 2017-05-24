@@ -9,17 +9,18 @@
 #define MAX_LINE_SIZE 256
 
 
-enum {
+/*enum {
     WRONG_PASSWORD = -1,
     ACCOUNT_NOT_EXIST = -2,
     AMOUNT_ILLEGAL =-3,
-}
+}*/
 
+class bank;
 
-class atm 
+class atm
 {
 	public:
-		atm (bank *associated_bank ,int id_num, pthread_t atm_id ) ;// c'tor
+		atm (bank* associated_bank ,int id_num, pthread_t atm_id ) ;// c'tor
 		
 		//atm (const atm& atm) ;  //copy c'tor
 		
@@ -44,7 +45,7 @@ class atm
 		bank *associated_bank_ ;
 		pthread_t atm_id_ ;
 		int id_num_;
-		pthread_mutex_t *atm_mutex_ ; //indicate that this atm is in use and unavilibale for new operation.
+		pthread_mutex_t atm_mutex_ ; //indicate that this atm is in use and unavilibale for new operation.
 	
 };
 
