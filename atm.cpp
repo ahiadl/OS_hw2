@@ -100,7 +100,7 @@ void atm_main_loop(int atmNum, pBank bank,char const actionFile){
 	
 //*******************************************************************************************************//
 	
-	void atm_open_account (unsigned int account_num , string password , unsigned int balance);
+	void atm::atm_open_account (unsigned int account_num , string password , unsigned int balance)
 	{
 		pthread_mutex_lock(&atm_mutex_);
 		
@@ -114,7 +114,7 @@ void atm_main_loop(int atmNum, pBank bank,char const actionFile){
 
 //*******************************************************************************************************//
 	
-	void atm_deposit (unsigned int account_num , string password , unsigned int amount); 
+	void atm::atm_deposit (unsigned int account_num , string password , unsigned int amount)
 	{	
 		pthread_mutex_lock(&atm_mutex_);
 		
@@ -141,7 +141,7 @@ void atm_main_loop(int atmNum, pBank bank,char const actionFile){
 
 //*******************************************************************************************************//
 	
-	void atm_withdraw (unsigned int account_num , string password , unsigned int amount); 
+	void atm::atm_withdraw (unsigned int account_num , string password , unsigned int amount)
 	{
 		pthread_mutex_lock(&atm_mutex_);
 		
@@ -172,7 +172,7 @@ void atm_main_loop(int atmNum, pBank bank,char const actionFile){
 
 //*******************************************************************************************************//
 	
-	void atm_get_balance (unsigned int account_num , string password); 
+	void atm::atm_get_balance (unsigned int account_num , string password)
 	{	
 		pthread_mutex_lock(&atm_mutex_);
 		
@@ -192,7 +192,7 @@ void atm_main_loop(int atmNum, pBank bank,char const actionFile){
 //*******************************************************************************************************//
 	
 	//verifay password and call to the account d'tor 
-	void atm_close_account (unsigned int account_num , string password); 
+	void atm::atm_close_account (unsigned int account_num , string password)
 	{	
 		pthread_mutex_lock(&atm_mutex_);
 		
@@ -213,7 +213,7 @@ void atm_main_loop(int atmNum, pBank bank,char const actionFile){
 //*******************************************************************************************************//
 	
 	//thie method using account methods to transfer the money. 
-	string atm_transfer_money (unsigned int source_account , string password ,unsigned int target_account, unsigned int amount); 
+	void atm::atm_transfer_money (unsigned int source_account , string password ,unsigned int target_account, unsigned int amount)
 	{
 		pthread_mutex_lock(&atm_mutex_);
 		

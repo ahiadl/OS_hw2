@@ -1,4 +1,4 @@
-// account.c
+ // account.c
 
 #include "account.h"
 
@@ -31,26 +31,25 @@
 				
 //**********************************************************************************************************//		
 
-	int account::account_deposit (string password , unsigned int amount);
+	int account::account_deposit (string password , unsigned int amount)
 	{
-		if(strcmp(password_ , password) != 0) //bad password
+		if(password_ != password)) //bad password
 		{
-			  return PASS_ERROR;.
+			  return PASS_ERROR;
 		}		
 		else   // password match 
 		{
 			sem_wait(sem_write);
 			usleep(1e6);
-			this.balance_ += amount ; 
-			//todo : handle log massage
+			balance_ += amount ;
 			sem_post(sem_write)	;
 		}
-		return this.balance_;
+		return balance_;
 	}
 				
 //**********************************************************************************************************//		
  
-	int account::account_withdraw (string password , int amount);
+	int account::account_withdraw (string password , int amount)
 	{
 		if (password_ != password)  // bad password
 		{
