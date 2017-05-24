@@ -33,8 +33,8 @@ using std::string ;
 #define NEG_ERROR -2 
 
 //forward declaration
-class atm;
-class account ;
+//class atm;
+//class account ;
 
 class bank
 {

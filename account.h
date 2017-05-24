@@ -2,9 +2,28 @@
 
 #ifndef account_H_
 #define account_H_
-#include "atm.h"
-#include "bank.h"
+//#include "atm.h"
+//#include "bank.h"
 
+#include <map>
+#include <vector>
+#include <string>
+#include <string.h>
+#include <stdlib.h>
+#include <cstring>
+#include <stdio.h>
+
+#include <pthread.h>
+#include <semaphore.h>
+#include <unistd.h>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+using std::cout;
+using std::map ;
+using std::vector ;
+using std::string ;
 
 class account
 {

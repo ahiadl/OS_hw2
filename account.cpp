@@ -33,7 +33,7 @@
 
 	int account::account_deposit (string password , unsigned int amount)
 	{
-		if(!password_.compare(password)) //bad password
+		if(password_ != password) //bad password
 		{
 			  return PASS_ERROR;
 		}		
@@ -111,7 +111,7 @@
 	 int account::account_close (string password)
 	 {
 	
-		if(strcmp(password_ , password) != 0) //bad password
+		if(password_ != password) //bad password
 		{
 			  return PASS_ERROR;
 		}		

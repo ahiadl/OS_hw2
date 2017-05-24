@@ -1,11 +1,11 @@
 //atm.cpp 
 
-#include <atm.h>
+#include "atm.h"
 
 //!!!! todo: i need t understand how the input gotten by the bank and deliverd to the atm 
 //may be class of argument that the bank handle ?
 
-void printError(int error_code, int atm_id, int account, int bal, int amount){
+/*void printError(int error_code, int atm_id, int account, int bal, int amount){
     switch(error_code){
         case WRONG_PASSWORD:
             printf("Error %d: Your transaction failed – account id %d does not exist\n",atm_id, account);
@@ -21,7 +21,7 @@ void printError(int error_code, int atm_id, int account, int bal, int amount){
             break;
         default: break;
     }
-}
+}*/
 
 
 
@@ -154,7 +154,7 @@ void atm_main_loop(int atmNum, pBank bank,char const actionFile){
 		else
 		{	
 			int new_balance = account_reff.account_withdraw(password,amount);
-			if(new_balance==PASS_ERROR);
+			if(new_balance==PASS_ERROR)
 			{
 				printf("Error %d: Your transaction failed – password for account id %d is incorrect\n",id_num_,account_num);
 			}
@@ -177,7 +177,7 @@ void atm_main_loop(int atmNum, pBank bank,char const actionFile){
 		pthread_mutex_lock(&atm_mutex_);
 		
 		
-		account_reff = associated_bank_::bank_accounts_.find(account_num) ; //get pointer for the account
+		account* account_reff = associated_bank_::bank_accounts_.find(account_num) ; //get pointer for the account
 		if(account_reff == associated_bank_::bank_accounts_.end()) // cant find account id
 		{
 			printf("Error %d: Your transaction failed – account id %d does not exist",id_num_,account_num);
