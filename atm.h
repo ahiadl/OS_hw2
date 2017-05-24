@@ -3,8 +3,8 @@
 #ifndef atm_H_
 #define atm_H_
 #include "bank.h"
-#include <string>
-using std::string ;
+#include "account.h"
+
 
 #define MAX_LINE_SIZE 256
 

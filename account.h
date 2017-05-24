@@ -3,10 +3,8 @@
 #ifndef account_H_
 #define account_H_
 #include "atm.h"
-#include <string.h>
-#include <pthread.h>
+#include "bank.h"
 
-using namespace std;
 
 class account
 {

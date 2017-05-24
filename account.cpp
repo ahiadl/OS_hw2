@@ -33,7 +33,7 @@
 
 	int account::account_deposit (string password , unsigned int amount)
 	{
-		if(password_ != password)) //bad password
+		if(!password_.compare(password)) //bad password
 		{
 			  return PASS_ERROR;
 		}		
@@ -49,7 +49,7 @@
 				
 //**********************************************************************************************************//		
  
-	int account::account_withdraw (string password , int amount)
+	int account::account_withdraw (string password ,unsigned int amount)
 	{
 		if (password_ != password)  // bad password
 		{
@@ -59,7 +59,7 @@
 		{
 			sem_wait(sem_write);
 			usleep(1e6);
-			if ( amount > this.balance_) // illegal withdraw
+			if ( amount > balance_) // illegal withdraw
 			{
 				//todo: handle illegal withdraw case;
 				sem_post(sem_write);
