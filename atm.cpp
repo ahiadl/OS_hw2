@@ -1,7 +1,6 @@
 //atm.cpp 
 
 #include "atm.h"
-
 //!!!! todo: i need t understand how the input gotten by the bank and deliverd to the atm 
 //may be class of argument that the bank handle ?
 
@@ -202,40 +201,50 @@ class bank ;
 	}
 
 
-void atm_main_loop(int atmNum, pBank bankInst,char const* actionFile){}
-    /*atm atminst(bankInst, atmNum);
-
-    std::string act;
-    vector<string> lineParam;
-    FILE* file = fopen(actionFile, "r");
-    while(fgets(act, MAX_LINE_SIZE, file){
-            lineParam = breakStr(act, " ");
-            int account_num = std::stoi(lineParam[1]);
-            int password = std::stoi (lineParam[2]));
-            switch (lineParam[0]){
-                case "O":
-                    atm_open_account(account_num ,  password , std::stoi(lineParam[3]));
-                    break;
-                case "D":
-                    atm_deposit (account_num, password, std::stoi(lineParam[3]));
-                    break;
-                case "W":
-                    atm_withdraw (account_num, password, std::stoi(lineParam[3]));
-                    break;
-                case "B":
-                    atm_get_balance (account_num, password);
-                    break;
-                case "Q":
-                    atm_close_account(account_num, password);
-                    break;
-                case "T":
-                    atm_transfer_money (account_num, password, std::stoi(lineParam[3]), std::stoi(lineParam[4]));
-                    break;
-                default: break;
-            }
-            usleep(100000);
+const vector<string> breakStr (const char* src, char delim){
+    char* tempLine;
+    strcpy(tempLine, src);
+    char* token = std::strtok(tempLine, &delim);
+    vector<string> brokenStr;
+    int i = 0;
+    while(token != NULL){
+        brokenStr.push_back(token);
+        i++;
+        token = std::strtok(NULL, &delim);
     }
-    fclose(file);
+    return brokenStr;
 }
-	*/
-	
+
+void atm_main_loop(int atmNum, pBank bankInst,char const* actionFile){
+        atm atminst(bankInst, atmNum);
+        vector<string> lineParam;
+        std::ifstream infile;
+        std::string line;
+        while(std::getline(infile,line)){
+                lineParam= breakStr(line.c_str(), ' ');
+                int account_num = std::stoi(lineParam[1]);
+                string password = lineParam[2];
+                switch (*lineParam[0].c_str()){
+                    case 'O':
+                        atminst.atm_open_account(account_num ,  password , std::stoi(lineParam[3]));
+                        break;
+                    case 'D':
+                        atminst.atm_deposit (account_num, password, std::stoi(lineParam[3]));
+                        break;
+                    case 'W':
+                        atminst.atm_withdraw (account_num, password, std::stoi(lineParam[3]));
+                        break;
+                    case 'B':
+                        atminst.atm_get_balance (account_num, password);
+                        break;
+                    case 'Q':
+                        atminst.atm_close_account(account_num, password);
+                        break;
+                    case 'T':
+                        atminst.atm_transfer_money (account_num, password, std::stoi(lineParam[3]), std::stoi(lineParam[4]));
+                        break;
+                    default: break;
+                }
+                usleep(100000);
+        }
+    }

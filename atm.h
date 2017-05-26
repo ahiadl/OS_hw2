@@ -17,6 +17,7 @@
 
 class bank;
 typedef bank* pBank;
+typedef std::vector<std::string> Tokens;
 class atm
 {
 	public:
