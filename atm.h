@@ -16,11 +16,11 @@
 }*/
 
 class bank;
-
+typedef bank* pBank;
 class atm
 {
 	public:
-		atm (bank* associated_bank ,int id_num, pthread_t atm_id ) ;// c'tor
+		atm (pBank *associated_bank ,int id_num) ;// c'tor
 		
 		//atm (const atm& atm) ;  //copy c'tor
 		
@@ -43,7 +43,6 @@ class atm
 		friend class bank ;
 	private:
 		bank *associated_bank_ ;
-		pthread_t atm_id_ ;
 		int id_num_;
 		pthread_mutex_t atm_mutex_ ; //indicate that this atm is in use and unavilibale for new operation.
 	

@@ -36,5 +36,7 @@ class bank
 		account bank_account_ ;
 };
 
+typedef bank* pBank;
+
 # endif 
 

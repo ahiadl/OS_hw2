@@ -25,12 +25,12 @@
 
 
 
-const vector<string> breakStr (const char* src, const char& delim){
+const vector<string> breakStr (char* src, const char* delim){
     char* token = std::strtok(src, delim);
     vector<string> brokenStr;
     int i = 0;
     while(token != NULL){
-        brokenStri.push_back(token);
+        brokenStr.push_back(token);
         i++;
         token = std::strtok(NULL, delim);
     }
@@ -38,8 +38,8 @@ const vector<string> breakStr (const char* src, const char& delim){
 }
 
 
-void atm_main_loop(int atmNum, pBank bank,char const actionFile){
-    atm atminst(bank,atmNum);
+void atm_main_loop(int atmNum, pBank bankInst,char const* actionFile){
+    atm atminst(bankInst&,atmNum&);
     std::string act;
     vector<string> lineParam;
     FILE* file = fopen(actionFile, "r")
@@ -76,10 +76,9 @@ void atm_main_loop(int atmNum, pBank bank,char const actionFile){
 
 //*******************************************************************************************************//
 
-	atm::atm (bank *associated_bank ,int id_num, pthread_t atm_id )
+	atm::atm (pBank associated_bank ,int id_num)
 	{
 		associated_bank_ = associated_bank;
-		atm_id_ = atm_id;
 		id_num_ = id_num;
 		pthread_mutex_init(&atm_mutex_ , NULL) ;
 	}
