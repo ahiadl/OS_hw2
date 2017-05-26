@@ -20,7 +20,7 @@ typedef bank* pBank;
 class atm
 {
 	public:
-		atm (pBank *associated_bank ,int id_num) ;// c'tor
+		atm (pBank associated_bank ,int id_num) ;// c'tor
 		
 		//atm (const atm& atm) ;  //copy c'tor
 		

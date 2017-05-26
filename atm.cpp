@@ -39,10 +39,10 @@ const vector<string> breakStr (char* src, const char* delim){
 
 
 void atm_main_loop(int atmNum, pBank bankInst,char const* actionFile){
-    atm atminst(bankInst&,atmNum&);
+    atm atminst(bankInst, atmNum);
     std::string act;
     vector<string> lineParam;
-    FILE* file = fopen(actionFile, "r")
+    FILE* file = fopen(actionFile, "r");
     while(fgets(act, MAX_LINE_SIZE, file){
             lineParam = breakStr(act, " ");
             int account_num = std::stoi(lineParam[1]);
