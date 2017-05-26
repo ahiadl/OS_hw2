@@ -8,7 +8,7 @@
 #include "includes.h"
 
 //forward declaration
-
+class atm ;
 
 class bank
 {

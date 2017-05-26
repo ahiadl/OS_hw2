@@ -2,8 +2,8 @@
 
 #ifndef atm_H_
 #define atm_H_
-//#include "bank.h"
-//#include "account.h"
+#include "bank.h"
+#include "account.h"
 #include "includes.h"
 
 #define MAX_LINE_SIZE 256
@@ -24,7 +24,7 @@ class atm
 		
 		//atm (const atm& atm) ;  //copy c'tor
 		
-		~atm () ; //d'tor
+		//~atm () ; //d'tor
 		
 		void atm_open_account (unsigned int account_num , string password , int balance);
 		

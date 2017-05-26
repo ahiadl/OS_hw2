@@ -38,41 +38,8 @@ const vector<string> breakStr (char* src, const char* delim){
 }
 
 
-void atm_main_loop(int atmNum, pBank bankInst,char const* actionFile){
-    atm atminst(bankInst, atmNum);
-    std::string act;
-    vector<string> lineParam;
-    FILE* file = fopen(actionFile, "r");
-    while(fgets(act, MAX_LINE_SIZE, file){
-            lineParam = breakStr(act, " ");
-            int account_num = std::stoi(lineParam[1]);
-            int password = std::stoi (lineParam[2]));
-            switch (lineParam[0]){
-                case "O":
-                    atm_open_account(account_num ,  password , std::stoi(lineParam[3]));
-                    break;
-                case "D":
-                    atm_deposit (account_num, password, std::stoi(lineParam[3]));
-                    break;
-                case "W":
-                    atm_withdraw (account_num, password, std::stoi(lineParam[3]));
-                    break;
-                case "B":
-                    atm_get_balance (account_num, password);
-                    break;
-                case "Q":
-                    atm_close_account(account_num, password);
-                    break;
-                case "T":
-                    atm_transfer_money (account_num, password, std::stoi(lineParam[3]), std::stoi(lineParam[4]));
-                    break;
-                default: break;
-            }
-            usleep(100000);
-    }
-    fclose(file);  
-}
 
+class bank ;
 
 //*******************************************************************************************************//
 
@@ -89,13 +56,13 @@ void atm_main_loop(int atmNum, pBank bankInst,char const* actionFile){
 	
 //*******************************************************************************************************//	
 	
-	atm::~atm () ; //d'tor
+	/*atm::~atm ()  //d'tor
 	{
 		pthread_exit(&atm_id_) ;
 		pthread_mutex_destroy(&atm_mutex_) ;
 		delete[] associated_bank_ ;
 		
-	}
+	}*/
 	
 //*******************************************************************************************************//
 	
@@ -103,10 +70,10 @@ void atm_main_loop(int atmNum, pBank bankInst,char const* actionFile){
 	{
 		pthread_mutex_lock(&atm_mutex_);
 		
-		
-		account* new_account = account::account(account_num, password, balance);
+
+		account new_account = account(account_num, password, balance);
 		//todo: handle existing key case ; !!!!
-		associated_bank_->bank_accounts_[account_num] = new_account ;
+		associated_bank_->bank_accounts_.insert(pair<unsigned int,account>(account_num,new_account));
 
 		//todo: get log massage and return it;
 		
@@ -234,7 +201,41 @@ void atm_main_loop(int atmNum, pBank bankInst,char const* actionFile){
 		pthread_mutex_unlock(&atm_mutex_);
 	}
 
-	
-	
-	
+
+void atm_main_loop(int atmNum, pBank bankInst,char const* actionFile){}
+    /*atm atminst(bankInst, atmNum);
+
+    std::string act;
+    vector<string> lineParam;
+    FILE* file = fopen(actionFile, "r");
+    while(fgets(act, MAX_LINE_SIZE, file){
+            lineParam = breakStr(act, " ");
+            int account_num = std::stoi(lineParam[1]);
+            int password = std::stoi (lineParam[2]));
+            switch (lineParam[0]){
+                case "O":
+                    atm_open_account(account_num ,  password , std::stoi(lineParam[3]));
+                    break;
+                case "D":
+                    atm_deposit (account_num, password, std::stoi(lineParam[3]));
+                    break;
+                case "W":
+                    atm_withdraw (account_num, password, std::stoi(lineParam[3]));
+                    break;
+                case "B":
+                    atm_get_balance (account_num, password);
+                    break;
+                case "Q":
+                    atm_close_account(account_num, password);
+                    break;
+                case "T":
+                    atm_transfer_money (account_num, password, std::stoi(lineParam[3]), std::stoi(lineParam[4]));
+                    break;
+                default: break;
+            }
+            usleep(100000);
+    }
+    fclose(file);
+}
+	*/
 	
