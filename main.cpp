@@ -1,5 +1,5 @@
 #include "bank.h"
-
+#include "atm.h"
 #include "includes.h"
 
 #define BANK_THREADS 2
