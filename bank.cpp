@@ -69,6 +69,19 @@ void bank_print_loop()
 	}
 
 //**************************************************************************************//
+    
+  void openAccount(unsigned int account_num, account new_account){
+        
+        this->bank_accounts_[account_num] = new_account;
+  }  
+
+
+
+
+
+
+
+
 
 	void bank::take_commision()
 	{

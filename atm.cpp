@@ -72,8 +72,8 @@ class bank ;
 
 		account new_account = account(account_num, password, balance);
 		//todo: handle existing key case ; !!!!
-		associated_bank_->bank_accounts_.insert(pair<unsigned int,account>(account_num,new_account));
-
+		//this->associated_bank_->bank_accounts_[account_num] = new_account;
+        associated_bank_->openAccount(account_num, new_account);
 		//todo: get log massage and return it;
 		
 		pthread_mutex_unlock(&atm_mutex_);
@@ -202,7 +202,7 @@ class bank ;
 
 
 const vector<string> breakStr (const char* src, char delim){
-    char* tempLine;
+    char tempLine[sizeof(*src)] = {0};
     strcpy(tempLine, src);
     char* token = std::strtok(tempLine, &delim);
     vector<string> brokenStr;

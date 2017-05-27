@@ -20,7 +20,9 @@ class bank
 		void take_commision ();
 		
 		void print_status () ;
-		
+        
+        void openAccount(unsigned int account_num, account new_account);
+        		
 		
 		friend class atm ; //i need the atm to access the acoounts of the bank
 		
