@@ -13,6 +13,8 @@ class account
 	public:
 		account (unsigned int account_num , string password , int balance);
 		
+		account (const account &obj);
+
 		virtual ~account();
 		
 		int account_deposit (string password ,unsigned int amount);

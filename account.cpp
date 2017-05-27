@@ -18,7 +18,19 @@
 		readers_count_ = 0 ;
 		
 	}
+
+	account::account (const account &obj)
+	{
+		account_num_ =obj.account_num_ ;
+		password_ = obj.password_ ;
+		balance_ = obj.balance_ ;
 		
+		sem_write  = obj.sem_write;
+		sem_read  = obj.sem_read;
+		//pthread_mutex_t *mutex_access ;  //critical section mutex
+		readers_count_ = obj.readers_count_ ;
+	}
+
 //**********************************************************************************************************//	
 
 	account::~account()
