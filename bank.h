@@ -17,7 +17,6 @@ class bank
 {
 	public:
 		bank (unsigned int account_num , string password , int balance);
-		~bank(){};
 		void* take_commission();
         void* print_status();
         int openAccount(unsigned int account_num, account new_account);

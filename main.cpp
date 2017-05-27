@@ -5,11 +5,16 @@
 
 int main (int argc, const char* argv[])
 {
-    if (argv == NULL){
+    cout <<"Welcome to Ahiads' & Roeis' Bank\n";
+    if(argc == 1){
+        cout << "No Argument sent to the Bank\n";
+        return -1;
+    }
+    if (argv[0] == NULL){
         cout << "Illegal Arguments";
         return -1;
     }
-    if (argc-1 !=  atoi(argv[0])){
+    if (argc !=  atoi(argv[0])){
         cout <<"Illegal Arguments";
         return -1;
     }

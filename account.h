@@ -12,28 +12,17 @@ class account
 {
 	public:
 		account(){};
-
         account (unsigned int account_num , string password , int balance);
-		
 		account (const account &obj);
-
 		virtual ~account();
-		
 		int account_deposit (string password ,unsigned int amount);
-		
 		int account_withdraw (string password ,unsigned int amount);
-		
 		int account_get_balance (string password);
-		
 		int account_close (string password);
-		
 		int account_get_money (unsigned int amount); 
-		
         account& operator=(const account& src);
-
 		friend class bank; //the private bank account access direct to the acouunts methids
 		
-		//friend class atm;
 	private:
 		unsigned int account_num_ ;
 		string password_ ;
@@ -41,7 +30,6 @@ class account
 		
 		sem_t *sem_write ;
 		sem_t *sem_read ;
-		//pthread_mutex_t *mutex_access ;  //critical section mutex 
 		int readers_count_ ;
 		
 };
