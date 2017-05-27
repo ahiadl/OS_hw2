@@ -6,14 +6,19 @@
 
 	account::account (unsigned int account_num , string password ,int balance)
 	{
-		account_num_ = account_num ;
+		cout << "started account ctor\n";
+        account_num_ = account_num ;
 		password_  = password ;
 		balance_ = balance ;
+        cout << "Done set Parameters\n";
 		//  todo: verift that this o_creat flag dosent do problems
 		sem_write = sem_open("sem_write",O_CREAT);
 		sem_read = sem_open("sem_read",O_CREAT);
+        cout <<"Done OPen Close\n";
 		sem_init(sem_write,1,1) ;
+        cout << " Done Init sem 1\n";
 		sem_init(sem_read,1,1) ;
+        cout << "Done Init\n";
 		//pthread_mutex_init(&mutex_crit, NULL);//(sem_queue,1,1) ;
 		readers_count_ = 0 ;
 		

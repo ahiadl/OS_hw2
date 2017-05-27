@@ -21,17 +21,16 @@ void* bank_print_loop(void* bankPtr){
 //	bank::bank(int atm_number, pthread_t atms_threads, pthread_t bank_operations)
 
 	bank::bank(unsigned int account_num , string password , int balance)
-	{
-		bank_pass = password ;
+	{   
+        cout << "started ctor\n";
+    	bank_pass = password ;
 		bank_account_num = account_num ;
 		bal = balance ;
-		//map<unsigned int,null> bank_accounts_ ;
-
-
+        cout << "done set parameters\n";
 		account temp(bank_account_num,bank_pass ,bal);
+        cout << "done creating temp accoutn\n";
         bank_account_ = temp;
-		bank_accounts_ ;
-
+        cout << "done ctor\n";
 		
 	}
 
