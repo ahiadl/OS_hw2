@@ -212,7 +212,12 @@ const vector<string> breakStr (const char* src, char delim){
     return brokenStr;
 }
 
-void atm_main_loop(int atmNum, pBank bankInst,char const* actionFile){
+void* atm_main_loop(void* atmParamsLocal){//int atmNum, pBank bankInst,char const* actionFile){
+        pAtmParams me = (pAtmParams)atmParamsLocal;
+        int atmNum = me->atmNum;
+        pBank bankInst = me->assBank;
+        char* actionFile = me->inputFile;
+        delete(me);
         atm atminst(bankInst, atmNum);
         vector<string> lineParam;
         std::ifstream infile;

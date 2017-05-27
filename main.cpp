@@ -1,4 +1,3 @@
-
 #include "includes.h"
 #include "atm.h"
 
@@ -38,13 +37,14 @@ int main (int argc, const char* argv[])
 		atms_vector->push_back(new_atm);
 	}
 
-
-
-
     int rc;
-
+    pAtmParams curAtmPar;
     for (currentAtm = 0; currentAtm < numOfAtm; currentAtm++){
-        int pthread_create(&atmsThreads[currentAtm], NULL, &atm_main_loop, (void*)argv[currentAtm]);
+        curAtmPar = new(std::nothrow) atmParams;
+        curAtmPar->atmNum = currentAtm;
+        curAtmPar->assBank = bank;
+        curAtmPar->inputFile = argv[currentAtm];
+        pthread_create(&atmsThreads[currentAtm], NULL, &atm_main_loop, (void*)curAtmPar);
         if (atmsThreads[currentAtm]){
             cout << "ERROR creating ATM " << currentAtm << " thread";
             exit(-1);

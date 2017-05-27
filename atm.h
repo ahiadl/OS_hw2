@@ -14,9 +14,24 @@
     ACCOUNT_NOT_EXIST = -2,
     AMOUNT_ILLEGAL =-3,
 }*/
+void* atm_main_loop(void* atmParamsiLocal);
+
+/*typedef struct {
+    int atmNum;
+    char* inputFile;
+    pBank assBank;
+}atmParams, pAtmParams;*/
 
 
 
+class atmParams{
+public:
+    int atmNum;
+    char* inputFile;
+    pBank assBank;
+};
+
+typedef atmParams* pAtmParams;
 typedef bank* pBank;
 typedef std::vector<std::string> Tokens;
 class atm
