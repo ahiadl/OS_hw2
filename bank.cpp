@@ -38,16 +38,23 @@ void* bank_print_loop(void* bankPtr){
 //**************************************************************************************//
     
   //void banjopenAccount(unsigned int account_num, account new_account){
-		void bank::openAccount(unsigned int account_num , account new_account)
+		int bank::openAccount(unsigned int account_num , account new_account)
 		{
 
 	  	//map<unsigned int,account*> ref_map = this.bank_accounts_;
 
         //this.bank_accounts_insert(std::pair <unsigned int,account*>(account_num,new_account));
 
-		bank_accounts_.insert(pair<unsigned int ,account>(account_num,new_account));
+			if (bank_accounts_.end()  != bank_accounts_.find(account_num))
+			{
+				bank_accounts_.insert(pair<unsigned int ,account>(account_num,new_account));
+				return 1;
+			}
+			else
+			{
+				return 0;
+			}
 		}
-
 
 
 	void* bank::take_commission()

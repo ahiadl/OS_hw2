@@ -71,11 +71,19 @@ const vector<string> breakStr (char* src, const char* delim){
 		
 
 		account new_account = account(account_num, password, balance);
-		//todo: handle existing key case ; !!!!
+
 		//this->associated_bank_->bank_accounts_[account_num] = new_account;
-        associated_bank_->openAccount(account_num, new_account);
-		//todo: get log massage and return it;
+        int rc = associated_bank_->openAccount(account_num, new_account);
 		
+        if (rc)
+        {
+        	printf("%d: New account is %d with password %s and initial balance %d)\n",id_num_,account_num,password,balance);
+        }
+        else
+        {
+        	printf("Error %d: Your transaction failed – account with the same is exists\n",account_num);
+        }
+
 		pthread_mutex_unlock(&atm_mutex_);
 	}
 

@@ -20,7 +20,7 @@ class bank
 		~bank(){};
 		void* take_commission();
         void* print_status();
-        void openAccount(unsigned int account_num, account new_account);
+        int openAccount(unsigned int account_num, account new_account);
 		
 		friend class atm ; //i need the atm to access the acoounts of the bank
 	private:
