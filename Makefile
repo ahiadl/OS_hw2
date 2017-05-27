@@ -8,7 +8,7 @@ RM = rm -f
 all: Bank
 # Creating the  executable
 Bank: $(OBJS)
-	$(CCLINK) -o Bank  $(OBJS)
+	$(CXXLINK) -o Bank  $(OBJS)
 # Creating the object files
 account.o: account.cpp account.h includes.h
 atm.o:  atm.cpp atm.h includes.h
