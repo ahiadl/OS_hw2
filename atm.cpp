@@ -222,17 +222,17 @@ void atm_main_loop(int atmNum, pBank bankInst,char const* actionFile){
         std::string line;
         while(std::getline(infile,line)){
                 lineParam= breakStr(line.c_str(), ' ');
-                int account_num = std::stoi(lineParam[1]);
+                int account_num = atoi(lineParam[1].c_str());
                 string password = lineParam[2];
                 switch (*lineParam[0].c_str()){
                     case 'O':
-                        atminst.atm_open_account(account_num ,  password , std::stoi(lineParam[3]));
+                        atminst.atm_open_account(account_num ,  password , atoi(lineParam[3].c_str()));
                         break;
                     case 'D':
-                        atminst.atm_deposit (account_num, password, std::stoi(lineParam[3]));
+                        atminst.atm_deposit (account_num, password, atoi(lineParam[3].c_str()));
                         break;
                     case 'W':
-                        atminst.atm_withdraw (account_num, password, std::stoi(lineParam[3]));
+                        atminst.atm_withdraw (account_num, password, atoi(lineParam[3].c_str()));
                         break;
                     case 'B':
                         atminst.atm_get_balance (account_num, password);
@@ -241,7 +241,7 @@ void atm_main_loop(int atmNum, pBank bankInst,char const* actionFile){
                         atminst.atm_close_account(account_num, password);
                         break;
                     case 'T':
-                        atminst.atm_transfer_money (account_num, password, std::stoi(lineParam[3]), std::stoi(lineParam[4]));
+                        atminst.atm_transfer_money (account_num, password, atoi(lineParam[3].c_str()), atoi(lineParam[4].c_str()));
                         break;
                     default: break;
                 }
