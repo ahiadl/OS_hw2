@@ -14,15 +14,14 @@ int main (int argc, const char* argv[])
         cout << "Illegal Arguments";
         return -1;
     }
-    if (argc !=  atoi(argv[0])){
-        cout <<"Illegal Arguments";
+    if (argc-2 !=  atoi(argv[1])){
+        cout <<"Illegal Arguments : argc: "<<argc<<"argv[0]"<<atoi(argv[0]) ; 
         return -1;
     }
     //todo: init this values; !!!
     int numOfAtm = atoi(argv[0]);
     int currentAtm=0;
 
-    string bank_pass = "959595320" ;
     unsigned int bank_account_num = BANLK_ACCOUNT_NUM ;
 
     //account bank_account_ = account(bank_account_num,bank_pass ,0) ;
@@ -37,7 +36,6 @@ int main (int argc, const char* argv[])
     //create atms vector -- moved out from the bank due to cycling dependence
     for(int i=0 ; i<numOfAtm ; i++) //i need to use iterators ?
 	{
-
 		atm new_atm = atm(&bank ,i);
 		atms_vector->push_back(new_atm);
 	}
