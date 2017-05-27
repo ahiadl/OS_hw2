@@ -11,7 +11,9 @@
 class account
 {
 	public:
-		account (unsigned int account_num , string password , int balance);
+		account();
+
+        account (unsigned int account_num , string password , int balance);
 		
 		account (const account &obj);
 
@@ -27,6 +29,8 @@ class account
 		
 		int account_get_money (unsigned int amount); 
 		
+        account& operator=(const account& src);
+
 		friend class bank; //the private bank account access direct to the acouunts methids
 		
 		//friend class atm;

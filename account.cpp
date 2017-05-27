@@ -46,6 +46,13 @@
 				
 //**********************************************************************************************************//		
 
+account& account::operator=(const account& src){
+   this->account_num_ = src.account_num_;
+   this->password_ = src.password_;
+   this->balance_ = src.balance_; 
+   return *this;
+}
+
 	int account::account_deposit (string password , unsigned int amount)
 	{
 		if(password_ != password) //bad password
