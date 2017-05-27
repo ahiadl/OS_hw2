@@ -11,7 +11,7 @@
 class account
 {
 	public:
-		account();
+		account(){};
 
         account (unsigned int account_num , string password , int balance);
 		
