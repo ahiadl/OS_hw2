@@ -11,7 +11,8 @@
 
 //class atm ;
 
-
+void* bank_main_loop(void* bankPtr);
+void* bank_print_loop(void* bankPtr);
 class bank
 {
 	public:
@@ -20,9 +21,9 @@ class bank
 		
 		~bank();
 		
-		void take_commision ();
-		
-		void print_status () ;
+		void* take_commission ();
+
+        void* print_status () ;
         
         void openAccount(unsigned int account_num, account new_account);
         		

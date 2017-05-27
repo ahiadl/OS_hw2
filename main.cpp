@@ -42,7 +42,7 @@ int main (int argc, const char* argv[])
     for (currentAtm = 0; currentAtm < numOfAtm; currentAtm++){
         curAtmPar = new(std::nothrow) atmParams;
         curAtmPar->atmNum = currentAtm;
-        curAtmPar->assBank = bank;
+        curAtmPar->assBank = &bank;
         curAtmPar->inputFile = argv[currentAtm];
         pthread_create(&atmsThreads[currentAtm], NULL, &atm_main_loop, (void*)curAtmPar);
         if (atmsThreads[currentAtm]){
@@ -50,12 +50,12 @@ int main (int argc, const char* argv[])
             exit(-1);
         }
     }
-    int pthread_create(&bankThreads[0], NULL, &bank::take_commision, bank);
+    rc = pthread_create(&bankThreads[0], NULL, &bank_main_loop, (void*)&bank);
     if(bankThreads[0]){
         cout << "ERROR creating bank";
         exit(-1);
     }
-    rc = pthread_create(&bankThreads[0], NULL, &bank::print_status,bank);
+    rc = pthread_create(&bankThreads[0], NULL,&bank_print_loop,(void*)&bank);
     if(rc){
         cout << "ERROR creating bank";
         exit(-1);
@@ -63,8 +63,8 @@ int main (int argc, const char* argv[])
 
     int atmWait;     
     for (atmWait = 0; atmWait < numOfAtm+2; atmWait++)
-      int pthread_join(atmsThreads[atmWait],NULL);
+      pthread_join(atmsThreads[atmWait],NULL);
     pthread_join(bankThreads[0],NULL); 
-
+    pthread_cancel(bankThreads[1]);
     return 0; 
 }

@@ -1,6 +1,6 @@
 # Makefile for the smash program
 CCC = g++
-CXXFLAGS = -g -Wall 
+CXXFLAGS = -g -Wall -std=c++11 
 CXXLINK = $(CCC)
 OBJS = account.o atm.o bank.o main.o
 RM = rm -f

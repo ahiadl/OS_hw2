@@ -216,7 +216,8 @@ void* atm_main_loop(void* atmParamsLocal){//int atmNum, pBank bankInst,char cons
         pAtmParams me = (pAtmParams)atmParamsLocal;
         int atmNum = me->atmNum;
         pBank bankInst = me->assBank;
-        char* actionFile = me->inputFile;
+        char* actionFile;
+        strcpy(actionFile, me->inputFile);
         delete(me);
         atm atminst(bankInst, atmNum);
         vector<string> lineParam;

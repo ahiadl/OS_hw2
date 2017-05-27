@@ -5,6 +5,22 @@
 
 //**************************************************************************************//
 //charge commison 
+
+void* bank_main_loop (void* bankPtr){
+    pBank ourBank = (pBank)bankPtr;
+    ourBank->take_commission();
+
+}
+
+void* bank_print_loop(void* bankPtr){
+    pBank ourBank = (pBank)bankPtr;
+    ourBank->print_status();
+}
+
+
+
+
+
 /*void bank_main_loop()
 {
 	while(1) // todo: i need to use here mutex/semaphores ?? 
@@ -83,7 +99,7 @@ void bank_print_loop()
 
 
 
-	void bank::take_commision()
+	void* bank::take_commission()
 	{
 		while(1) // todo: i need to use here mutex/semaphores ??
 			{
@@ -107,7 +123,7 @@ void bank_print_loop()
 	
 //**************************************************************************************//
 
-	void bank::print_status()
+	void* bank::print_status()
 	{
 		while(1)
 	{

@@ -27,7 +27,7 @@ void* atm_main_loop(void* atmParamsiLocal);
 class atmParams{
 public:
     int atmNum;
-    char* inputFile;
+    const char* inputFile;
     pBank assBank;
 };
 
