@@ -2,6 +2,7 @@
 
 #ifndef account_H_
 #define account_H_
+
 //#include "atm.h"
 //#include "bank.h"
 
@@ -12,7 +13,7 @@ class account
 	public:
 		account (unsigned int account_num , string password , int balance);
 		
-		~account();
+		virtual ~account();
 		
 		int account_deposit (string password ,unsigned int amount);
 		

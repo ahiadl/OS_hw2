@@ -3,7 +3,7 @@
 #ifndef atm_H_
 #define atm_H_
 #include "bank.h"
-#include "account.h"
+//#include "account.h"
 #include "includes.h"
 
 #define MAX_LINE_SIZE 256
@@ -15,7 +15,8 @@
     AMOUNT_ILLEGAL =-3,
 }*/
 
-class bank;
+
+
 typedef bank* pBank;
 typedef std::vector<std::string> Tokens;
 class atm

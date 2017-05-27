@@ -38,7 +38,7 @@ const vector<string> breakStr (char* src, const char* delim){
 
 
 
-class bank ;
+
 
 //*******************************************************************************************************//
 
@@ -84,16 +84,15 @@ class bank ;
 	void atm::atm_deposit (unsigned int account_num , string password , unsigned int amount)
 	{	
 		pthread_mutex_lock(&atm_mutex_);
-		
-		map<unsigned int ,account*>::iterator it;
-		it = associated_bank_->bank_accounts_.find(account_num) ; //get pointer for the account
-		if(it == associated_bank_->bank_accounts_.end()) // cant find account id
+
+		//it = associated_bank_->bank_accounts_.find(account_num) ; //get pointer for the account
+		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id
 		{
 			printf("Error %d: Your transaction failed – account id %d does not exist\n",id_num_,account_num);
 		}
 		else
 		{	
-			int new_balance = it->second->account_deposit(password,amount);
+			int new_balance =associated_bank_->bank_accounts_.find(account_num)->second.account_deposit(password,amount);
 			if(new_balance==PASS_ERROR)
 			{
 				printf("Error %d: Your transaction failed – password for account id %d is incorrect\n",id_num_,account_num);
@@ -111,16 +110,14 @@ class bank ;
 	void atm::atm_withdraw (unsigned int account_num , string password , unsigned int amount)
 	{
 		pthread_mutex_lock(&atm_mutex_);
-		
-		map<unsigned int ,account*>::iterator it;
-		it = associated_bank_->bank_accounts_.find(account_num) ; //get pointer for the account
-		if(it == associated_bank_->bank_accounts_.end()) // cant find account id
+
+		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id
 		{
 			printf("Error %d: Your transaction failed – account id %d does not exist",id_num_,account_num);
 		}
 		else
 		{	
-			int new_balance = it->second->account_withdraw(password,amount);
+			int new_balance = associated_bank_->bank_accounts_.find(account_num)->second.account_withdraw(password,amount);
 			if(new_balance==PASS_ERROR)
 			{
 				printf("Error %d: Your transaction failed – password for account id %d is incorrect\n",id_num_,account_num);
@@ -142,16 +139,14 @@ class bank ;
 	void atm::atm_get_balance (unsigned int account_num , string password)
 	{	
 		pthread_mutex_lock(&atm_mutex_);
-		
-		map<unsigned int ,account*>::iterator it;
-		it = associated_bank_->bank_accounts_.find(account_num) ; //get pointer for the account
-		if(it == associated_bank_->bank_accounts_.end()) // cant find account id
+
+		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id
 		{
 			printf("Error %d: Your transaction failed – account id %d does not exist",id_num_,account_num);
 		}
 		else
 		{	
-			it->second->account_get_balance(password);
+			associated_bank_->bank_accounts_.find(account_num)->second.account_get_balance(password);
 		//todo: get log massage and return it;
 		}
 		pthread_mutex_unlock(&atm_mutex_);
@@ -162,17 +157,14 @@ class bank ;
 	void atm::atm_close_account (unsigned int account_num , string password)
 	{	
 		pthread_mutex_lock(&atm_mutex_);
-		
-		
-		map<unsigned int ,account*>::iterator it;
-		it = associated_bank_->bank_accounts_.find(account_num) ; //get pointer for the account
-		if(it == associated_bank_->bank_accounts_.end()) // cant find account id
+
+		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id
 		{
 			printf("Error %d: Your transaction failed – account id %d does not exist",id_num_,account_num);
 		}
 		else
 		{	
-			it->second->account_close(password);
+			associated_bank_->bank_accounts_.find(account_num)->second.account_close(password);
 		//todo: get log massage and return it;
 		}
 		pthread_mutex_unlock(&atm_mutex_);
@@ -185,12 +177,17 @@ class bank ;
 	{
 		pthread_mutex_lock(&atm_mutex_);
 		
-		map<unsigned int ,account*>::iterator src_it;
-		map<unsigned int ,account*>::iterator tgt_it;
+		//associated_bank_->bank_accounts_.find(account_num)->second
+
+		map<unsigned int ,account>::iterator src_it;
+		map<unsigned int ,account>::iterator tgt_it;
 		src_it = associated_bank_->bank_accounts_.find(source_account) ; //get referance pointer to account--need allocation ?
 		tgt_it = associated_bank_->bank_accounts_.find(target_account) ;
 		
-		src_it->second->account_withdraw(password,amount);
+
+		//src_it->second->account_withdraw(password,amount);
+		associated_bank_->bank_accounts_.find(source_account)->second.account_withdraw(password,amount);
+
 		//todo: 
 		//if(the return value of withdraw indicate success then do) 
 			//target_account_reff.account_get_money(amount);

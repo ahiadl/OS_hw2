@@ -9,6 +9,9 @@
 		account_num_ = account_num ;
 		password_  = password ;
 		balance_ = balance ;
+		//  todo: verift that this o_creat flag dosent do problems
+		sem_write = sem_open("sem_write",O_CREAT);
+		sem_read = sem_open("sem_read",O_CREAT);
 		sem_init(sem_write,1,1) ;
 		sem_init(sem_read,1,1) ;
 		//pthread_mutex_init(&mutex_crit, NULL);//(sem_queue,1,1) ;

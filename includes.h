@@ -8,7 +8,6 @@
 #ifndef INCLUDES_H_
 #define INCLUDES_H_
 
-
 #include <map>
 #include <vector>
 #include <string>
@@ -23,6 +22,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <fcntl.h>
+
 
 using std::cout;
 using std::map ;
