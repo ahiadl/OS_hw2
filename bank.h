@@ -41,7 +41,7 @@ class bank
 		map<unsigned int,account>::iterator accounts_it ;
 		//vector<atm> atms_vector ;
 		//vector<pthread_t*> atms_threads ;
-		account bank_account_ ;
+		account bank_account_() ;
 
 };
 
