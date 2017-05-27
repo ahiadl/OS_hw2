@@ -1,6 +1,6 @@
 
 #include "includes.h"
-
+#include "atm.h"
 
 #define BANK_THREADS 2
 
@@ -25,6 +25,7 @@ int main (int argc, const char* argv[])
 
     bank bank(bank_account_num,bank_pass ,0);
     vector<atm> atms_vector[numOfAtm];
+    //vector<atm>::iterator it = atms_vector->begin();
 
     pthread_t atmsThreads[numOfAtm];
 	pthread_t bankThreads[2]; //for example - i need dedicated thread for taking commison
@@ -32,8 +33,9 @@ int main (int argc, const char* argv[])
     //create atms vector -- moved out from the bank due to cycling dependence
     for(int i=0 ; i<numOfAtm ; i++) //i need to use iterators ?
 	{
-		atm new_atm = atm(*bank ,i);
-		atms_vector[i] = new_atm ;
+
+		atm new_atm = atm(&bank ,i);
+		atms_vector->push_back(new_atm);
 	}
 
 

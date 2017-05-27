@@ -62,7 +62,7 @@ void bank_print_loop()
 		//map<unsigned int,null> bank_accounts_ ;
 
 
-		bank_account_ = account(bank_account_num,bank_pass ,bal) ;
+		bank_account_ ()= account(bank_account_num,bank_pass ,bal) ;
 		bank_accounts_ ;
 
 		
@@ -99,7 +99,7 @@ void bank_print_loop()
 					unsigned int commison_rate = cur_balance*(rand_commison/100);
 
 					cur_acount.account_withdraw(cur_acount_pass,commison_rate);
-					bank::bank_account_.account_get_money(commison_rate);
+					bank::bank_account_().account_get_money(commison_rate);
 					printf("Bank: commissions of %d were charged, the bank gained %d $ from account %d",rand_commison,commison_rate,cur_acount_num);
 				}
 			}
@@ -122,8 +122,8 @@ void bank_print_loop()
 
 			printf("Account %d: Balance – %d $ , Account Password – $c\n",cur_acount_num,cur_balance,cur_acount_pass);
 		}
-		string bank_pass = bank::bank_account_.password_;
-		printf("The Bank has %d $\n",bank::bank_account_.account_get_balance(bank_pass));
+		string bank_pass = bank::bank_account_().password_;
+		printf("The Bank has %d $\n",bank::bank_account_().account_get_balance(bank_pass));
 	}
 	}
 
