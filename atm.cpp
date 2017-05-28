@@ -221,41 +221,63 @@ const vector<string> breakStr (const char* src, char delim){
 }
 
 void* atm_main_loop(void* atmParamsLocal){//int atmNum, pBank bankInst,char const* actionFile){
+
+		cout <<"debug in the start of main loop" < "\n";
         pAtmParams me = (pAtmParams)atmParamsLocal;
+
         int atmNum = me->atmNum;
+
         pBank bankInst = me->assBank;
+
         char* actionFile;
+
+        cout <<"debug in main loop before strcpy" < "\n";
         strcpy(actionFile, me->inputFile);
+        cout <<"debug in main loop after strcpy" < "\n";
         delete(me);
+
         atm atminst(bankInst, atmNum);
-        vector<string> lineParam;
-        std::ifstream infile;
+        //vector<string> lineParam;
+
+        std::ifstream infile(actionFile);
         std::string line;
+        cout << "*debug -inside atm main loop before the main while" << "\n" ;
         while(std::getline(infile,line)){
-                lineParam= breakStr(line.c_str(), ' ');
-                int account_num = atoi(lineParam[1].c_str());
-                string password = lineParam[2];
-                switch (*lineParam[0].c_str()){
-                    case 'O':
-                        atminst.atm_open_account(account_num ,  password , atoi(lineParam[3].c_str()));
-                        break;
-                    case 'D':
-                        atminst.atm_deposit (account_num, password, atoi(lineParam[3].c_str()));
-                        break;
-                    case 'W':
-                        atminst.atm_withdraw (account_num, password, atoi(lineParam[3].c_str()));
-                        break;
-                    case 'B':
-                        atminst.atm_get_balance (account_num, password);
-                        break;
-                    case 'Q':
-                        atminst.atm_close_account(account_num, password);
-                        break;
-                    case 'T':
-                        atminst.atm_transfer_money (account_num, password, atoi(lineParam[3].c_str()), atoi(lineParam[4].c_str()));
-                        break;
-                    default: break;
+        		cout << "**debug -inside atm main loop inside! the main while --line param is:"<<line << "\n" ;
+
+        		std::stringstream lineParam(line);
+                //lineParam= breakStr(line.c_str(), ' ');
+
+                string cmd;
+                lineParam >> cmd;
+                unsigned int account_num;
+                string password;
+                int amount;
+                lineParam >> account_num >> password >> amount ;
+                cout <<"**debug -atm main loop before the switch lineParam value is"<<cmd<<"\n";
+                if(cmd == "O"){
+                		cout <<"***debug -atm main loop switch O"<<"\n";
+                        atminst.atm_open_account(account_num ,  password , amount);
                 }
+                else if(cmd == "D"){
+                        atminst.atm_deposit (account_num, password, amount);
+                }
+                else if(cmd == "W"){
+                        atminst.atm_withdraw (account_num, password, amount);
+                }
+                else if(cmd == "B"){
+                        atminst.atm_get_balance (account_num, password);
+                }
+                else if(cmd == "Q"){
+                        atminst.atm_close_account(account_num, password);
+                }
+                else if(cmd == "T"){
+                    	unsigned int dst;
+                    	lineParam >> dst;
+                        atminst.atm_transfer_money (account_num, password, amount, dst);
+                }
+
+
                 usleep(100000);
         }
     }
