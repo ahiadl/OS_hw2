@@ -231,9 +231,9 @@ void* atm_main_loop(void* atmParamsLocal){//int atmNum, pBank bankInst,char cons
 
         char* actionFile;
 
-        cout <<"debug in main loop before strcpy" < "\n";
+        cout <<"debug in main loop before strcpy" << "\n";
         strcpy(actionFile, me->inputFile);
-        cout <<"debug in main loop after strcpy" < "\n";
+        cout <<"debug in main loop after strcpy" << "\n";
         delete(me);
 
         atm atminst(bankInst, atmNum);
