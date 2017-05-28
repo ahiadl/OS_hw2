@@ -28,8 +28,8 @@ class account
 		string password_ ;
 		int balance_ ;
 		
-		sem_t *sem_write ;
-		sem_t *sem_read ;
+		sem_t sem_write ;
+		sem_t sem_read ;
 		int readers_count_ ;
 		
 };

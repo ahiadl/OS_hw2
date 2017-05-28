@@ -27,6 +27,7 @@ int main (int argc, const char* argv[])
     //account bank_account_ = account(bank_account_num,bank_pass ,0) ;
     string bank_pass = "123456"; 
     bank bank(bank_account_num,bank_pass ,0);
+    cout << "back to main";
     vector<atm> atms_vector[numOfAtm];
     //vector<atm>::iterator it = atms_vector->begin();
     cout << "numOfAtm: " << numOfAtm<< "\n";
