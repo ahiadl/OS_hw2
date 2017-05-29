@@ -7,7 +7,7 @@
 #include "includes.h"
 
 #define MAX_LINE_SIZE 256
-
+#define DEBUG 0 
 
 /*enum {
     WRONG_PASSWORD = -1,

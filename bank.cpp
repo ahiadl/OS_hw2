@@ -88,6 +88,7 @@ void* bank_print_loop(void* bankPtr){
 	{
 		sleep(0.5);
 		printf("Current Bank Status\n");
+        sleep(5);
 		for (accounts_it = bank::bank_accounts_.begin(); accounts_it != bank::bank_accounts_.end(); ++accounts_it)
 		{
 			int cur_acount_num = accounts_it->first ;		 //account id (int)

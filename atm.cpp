@@ -222,18 +222,18 @@ const vector<string> breakStr (const char* src, char delim){
 
 void* atm_main_loop(void* atmParamsLocal){//int atmNum, pBank bankInst,char const* actionFile){
 
-		cout <<"debug in the start of main loop" << "\n";
+		if(DEBUG)cout <<"debug in the start of main loop" << "\n";
         pAtmParams me = (pAtmParams)atmParamsLocal;
 
         int atmNum = me->atmNum;
 
         pBank bankInst = me->assBank;
+        if(DEBUG)cout << "Size of file name string " << sizeof(char)*strlen(me->inputFile) <<"\n";
+        char* actionFile = new char[strlen(me->inputFile)];
 
-        char* actionFile;
-
-        cout <<"debug in main loop before strcpy" << "\n";
+        if(DEBUG)cout <<"debug in main loop before strcpy" << "\n";
         strcpy(actionFile, me->inputFile);
-        cout <<"debug in main loop after strcpy" << "\n";
+        if(DEBUG)cout <<"debug in main loop after strcpy" << "\n";
         delete(me);
 
         atm atminst(bankInst, atmNum);
@@ -241,9 +241,9 @@ void* atm_main_loop(void* atmParamsLocal){//int atmNum, pBank bankInst,char cons
 
         std::ifstream infile(actionFile);
         std::string line;
-        cout << "*debug -inside atm main loop before the main while" << "\n" ;
+        if(DEBUG)cout << "*debug -inside atm main loop before the main while" << "\n" ;
         while(std::getline(infile,line)){
-        		cout << "**debug -inside atm main loop inside! the main while --line param is:"<<line << "\n" ;
+        		if(DEBUG)cout << "**debug -inside atm main loop inside! the main while --line param is:"<<line << "\n" ;
 
         		std::stringstream lineParam(line);
                 //lineParam= breakStr(line.c_str(), ' ');
@@ -254,9 +254,9 @@ void* atm_main_loop(void* atmParamsLocal){//int atmNum, pBank bankInst,char cons
                 string password;
                 int amount;
                 lineParam >> account_num >> password >> amount ;
-                cout <<"**debug -atm main loop before the switch lineParam value is"<<cmd<<"\n";
+                if(DEBUG)cout <<"**debug -atm main loop before the switch lineParam value is"<<cmd<<"\n";
                 if(cmd == "O"){
-                		cout <<"***debug -atm main loop switch O"<<"\n";
+                		if(DEBUG)cout <<"***debug -atm main loop switch O"<<"\n";
                         atminst.atm_open_account(account_num ,  password , amount);
                 }
                 else if(cmd == "D"){
@@ -280,5 +280,6 @@ void* atm_main_loop(void* atmParamsLocal){//int atmNum, pBank bankInst,char cons
 
                 usleep(100000);
         }
+        delete(actionFile);
         return NULL;
     }
