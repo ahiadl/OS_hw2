@@ -52,7 +52,7 @@ int main (int argc, const char* argv[])
         curAtmPar->atmNum = currentAtm;
         curAtmPar->assBank = &bank;
         curAtmPar->inputFile = argv[currentAtm];
-        cout <<"**debug argument passing to thread argv[curr] is:" << atoi(argv[currentAtm]) <<"\n";
+        cout <<"**debug argument passing to thread argv[curr] is:" << atoi(argv[currentAtm+2]) <<"\n";
         rc = pthread_create(&atmsThreads[currentAtm], NULL, &atm_main_loop, (void*)curAtmPar);
         if (rc){
             cout << "ERROR creating ATM " << currentAtm << " thread";

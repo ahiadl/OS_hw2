@@ -9,12 +9,14 @@
 void* bank_main_loop (void* bankPtr){
     pBank ourBank = (pBank)bankPtr;
     ourBank->take_commission();
+    return NULL;
 
 }
 
 void* bank_print_loop(void* bankPtr){
     pBank ourBank = (pBank)bankPtr;
     ourBank->print_status();
+    return NULL;
 }
 
 //**************************************************************************************//
@@ -93,7 +95,7 @@ void* bank_print_loop(void* bankPtr){
 			string cur_acount_pass = cur_acount.password_ ;
 			int cur_balance = cur_acount.account_get_balance(cur_acount_pass);
 
-			printf("Account %d: Balance – %d $ , Account Password – $c\n",cur_acount_num,cur_balance,cur_acount_pass);
+			printf("Account %d: Balance – %d $ , Account Password – %s\n",cur_acount_num,cur_balance,cur_acount_pass.c_str());
 		}
 		string bank_pass = bank::bank_account_.password_;
 		printf("The Bank has %d $\n",bank::bank_account_.account_get_balance(bank_pass));

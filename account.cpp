@@ -53,7 +53,7 @@ account& account::operator=(const account& src){
    return *this;
 }
 
-	int account::account_deposit (string password , unsigned int amount)
+	int account::account_deposit (string password , int amount)
 	{
 		if(password_ != password) //bad password
 		{
@@ -71,7 +71,7 @@ account& account::operator=(const account& src){
 				
 //**********************************************************************************************************//		
  
-	int account::account_withdraw (string password ,unsigned int amount)
+	int account::account_withdraw (string password ,int amount)
 	{
 		if (password_ != password)  // bad password
 		{
@@ -149,7 +149,7 @@ account& account::operator=(const account& src){
  
  //**********************************************************************************************************//	
  
-	int account::account_get_money (unsigned int amount)
+	int account::account_get_money (int amount)
 	{	
 	//this method are used for atm transfer money -- the target account don't need password
 		

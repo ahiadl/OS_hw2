@@ -77,7 +77,7 @@ const vector<string> breakStr (char* src, const char* delim){
 		
         if (rc)
         {
-        	printf("%d: New account is %d with password %s and initial balance %d)\n",id_num_,account_num,password,balance);
+        	printf("%d: New account is %d with password %s and initial balance %d)\n",id_num_,account_num,password.c_str(),balance);
         }
         else
         {
@@ -222,7 +222,7 @@ const vector<string> breakStr (const char* src, char delim){
 
 void* atm_main_loop(void* atmParamsLocal){//int atmNum, pBank bankInst,char const* actionFile){
 
-		cout <<"debug in the start of main loop" < "\n";
+		cout <<"debug in the start of main loop" << "\n";
         pAtmParams me = (pAtmParams)atmParamsLocal;
 
         int atmNum = me->atmNum;
@@ -280,4 +280,5 @@ void* atm_main_loop(void* atmParamsLocal){//int atmNum, pBank bankInst,char cons
 
                 usleep(100000);
         }
+        return NULL;
     }
