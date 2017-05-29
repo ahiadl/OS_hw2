@@ -78,7 +78,7 @@ const vector<string> breakStr (char* src, const char* delim){
 		
         if (rc)
         {
-        	printf("%d: New account is %d with password %s and initial balance %d)\n",id_num_,account_num,password.c_str(),balance);
+        	printf("%d: New account is %d with password %s and initial balance %d\n",id_num_,account_num,password.c_str(),balance);
         }
         else
         {
@@ -110,7 +110,7 @@ const vector<string> breakStr (char* src, const char* delim){
 			}
 			else 
 			{
-				printf("%d: Account %d new balance is %d after %d $ was deposited)\n",id_num_,account_num,new_balance,amount);
+				printf("%d: Account %d new balance is %d after %d $ was deposited\n",id_num_,account_num,new_balance,amount);
 			}
 		}
 		pthread_mutex_unlock(&atm_mutex_);
@@ -153,10 +153,11 @@ const vector<string> breakStr (char* src, const char* delim){
 	{	
 		sem_wait(&associated_bank_->bank_read);
 		pthread_mutex_lock(&atm_mutex_);
-		associated_bank_->reader_count ++ ; //todo: verify that atm can change private bank vat
-		if (associated_bank_->reader_count>0){
+		 //todo: verify that atm can change private bank vat
+		if (associated_bank_->reader_count==0){
 			sem_wait(&associated_bank_->bank_write); //todo : try sem_trywait here
 		}
+		associated_bank_->reader_count ++ ;
 		sem_post(&associated_bank_->bank_read);
 
 		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id

@@ -110,9 +110,10 @@ account& account::operator=(const account& src){
 		else   // password match
 		{
 			sem_wait(&sem_read) ;
-			readers_count_ ++ ;
-			if(readers_count_ > 0)
+
+			if(readers_count_ == 0)
 				sem_wait(&sem_write);   // we dont allow any reader if we need to write .// todo: try -sem_trywait here
+			readers_count_ ++ ;
 			sem_post(&sem_read);
 			
 			int cur_balance = balance_ ;
