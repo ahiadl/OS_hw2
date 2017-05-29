@@ -50,7 +50,7 @@ void* bank_print_loop(void* bankPtr){
 
         //this.bank_accounts_insert(std::pair <unsigned int,account*>(account_num,new_account));
 
-			if (bank_accounts_.end()  != bank_accounts_.find(account_num))
+			if (bank_accounts_.end()  == bank_accounts_.find(account_num))
 			{
 				bank_accounts_.insert(pair<unsigned int ,account>(account_num,new_account));
 				return 1;
