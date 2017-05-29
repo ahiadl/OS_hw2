@@ -151,15 +151,16 @@ const vector<string> breakStr (char* src, const char* delim){
 	
 	void atm::atm_get_balance (unsigned int account_num , string password)
 	{	
-		sem_wait(&associated_bank_->bank_read);
-		pthread_mutex_lock(&atm_mutex_);
+		/*sem_wait(&associated_bank_->bank_read);
+
 		 //todo: verify that atm can change private bank vat
 		if (associated_bank_->reader_count==0){
 			sem_wait(&associated_bank_->bank_write); //todo : try sem_trywait here
 		}
 		associated_bank_->reader_count ++ ;
 		sem_post(&associated_bank_->bank_read);
-
+		*/
+		pthread_mutex_lock(&atm_mutex_);
 		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id
 		{
 			printf("Error %d: Your transaction failed – account id %d does not exist",id_num_,account_num);
@@ -169,13 +170,15 @@ const vector<string> breakStr (char* src, const char* delim){
 			associated_bank_->bank_accounts_.find(account_num)->second.account_get_balance(password);
 		//todo: get log massage and return it;
 		}
+		pthread_mutex_unlock(&atm_mutex_);
+		/*readers writer implimtation are in the print status method
 		sem_wait(&associated_bank_->bank_read);
 		associated_bank_->reader_count -- ;
 		if(associated_bank_->reader_count ==0){
 			sem_post(&associated_bank_->bank_write);
 		}
-		sem_post(&associated_bank_->bank_read);
-		pthread_mutex_unlock(&atm_mutex_);
+		sem_post(&associated_bank_->bank_read);*/
+
 	}
 //*******************************************************************************************************//
 	
