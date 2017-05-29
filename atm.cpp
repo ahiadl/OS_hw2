@@ -67,8 +67,9 @@ const vector<string> breakStr (char* src, const char* delim){
 	
 	void atm::atm_open_account (unsigned int account_num , string password , int balance)
 	{
+		sem_wait(&associated_bank_->bank_write);
 		pthread_mutex_lock(&atm_mutex_);
-		
+		sem_post(&associated_bank_->bank_write);
 
 		account new_account = account(account_num, password, balance);
 
@@ -91,7 +92,9 @@ const vector<string> breakStr (char* src, const char* delim){
 	
 	void atm::atm_deposit (unsigned int account_num , string password , unsigned int amount)
 	{	
+		sem_wait(&associated_bank_->bank_write);
 		pthread_mutex_lock(&atm_mutex_);
+		sem_post(&associated_bank_->bank_write);
 
 		//it = associated_bank_->bank_accounts_.find(account_num) ; //get pointer for the account
 		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id
@@ -117,7 +120,9 @@ const vector<string> breakStr (char* src, const char* delim){
 	
 	void atm::atm_withdraw (unsigned int account_num , string password , unsigned int amount)
 	{
+		sem_wait(&associated_bank_->bank_write);
 		pthread_mutex_lock(&atm_mutex_);
+		sem_post(&associated_bank_->bank_write);
 
 		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id
 		{
@@ -146,7 +151,13 @@ const vector<string> breakStr (char* src, const char* delim){
 	
 	void atm::atm_get_balance (unsigned int account_num , string password)
 	{	
+		sem_wait(&associated_bank_->bank_read);
 		pthread_mutex_lock(&atm_mutex_);
+		associated_bank_->reader_count ++ ; //todo: verify that atm can change private bank vat
+		if (associated_bank_->reader_count>0){
+			sem_wait(&associated_bank_->bank_write); //todo : try sem_trywait here
+		}
+		sem_post(&associated_bank_->bank_read);
 
 		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id
 		{
@@ -157,6 +168,12 @@ const vector<string> breakStr (char* src, const char* delim){
 			associated_bank_->bank_accounts_.find(account_num)->second.account_get_balance(password);
 		//todo: get log massage and return it;
 		}
+		sem_wait(&associated_bank_->bank_read);
+		associated_bank_->reader_count -- ;
+		if(associated_bank_->reader_count ==0){
+			sem_post(&associated_bank_->bank_write);
+		}
+		sem_post(&associated_bank_->bank_read);
 		pthread_mutex_unlock(&atm_mutex_);
 	}
 //*******************************************************************************************************//
@@ -164,7 +181,9 @@ const vector<string> breakStr (char* src, const char* delim){
 	//verifay password and call to the account d'tor 
 	void atm::atm_close_account (unsigned int account_num , string password)
 	{	
+		sem_wait(&associated_bank_->bank_write);
 		pthread_mutex_lock(&atm_mutex_);
+		sem_post(&associated_bank_->bank_write);
 
 		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id
 		{
@@ -183,8 +202,9 @@ const vector<string> breakStr (char* src, const char* delim){
 	//thie method using account methods to transfer the money. 
 	void atm::atm_transfer_money (unsigned int source_account , string password ,unsigned int target_account, unsigned int amount)
 	{
+		sem_wait(&associated_bank_->bank_write);
 		pthread_mutex_lock(&atm_mutex_);
-		
+		sem_post(&associated_bank_->bank_write);
 		//associated_bank_->bank_accounts_.find(account_num)->second
 
 		map<unsigned int ,account>::iterator src_it;

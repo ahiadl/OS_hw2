@@ -29,6 +29,11 @@ class bank
 		map<unsigned int,account> bank_accounts_ ;
 		map<unsigned int,account>::iterator accounts_it ;
 		account bank_account_;
+
+		sem_t bank_read;
+		sem_t bank_write;
+		int reader_count;
+
 };
 
 typedef bank* pBank;

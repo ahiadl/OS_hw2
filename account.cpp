@@ -14,7 +14,7 @@
     //	sem_read = sem_open("sem_read",O_CREAT);
 		sem_init(&sem_write,1,1) ;
 		sem_init(&sem_read,1,1) ;
-		//pthread_mutex_init(&mutex_crit, NULL);//(sem_queue,1,1) ;
+
 		readers_count_ = 0 ;
 		
 	}
@@ -108,11 +108,11 @@ account& account::operator=(const account& src){
 			 return PASS_ERROR;
 		}
 		else   // password match
-		{	
+		{
 			sem_wait(&sem_read) ;
 			readers_count_ ++ ;
 			if(readers_count_ > 0)
-				sem_trywait(&sem_write);   // we dont allow any reader if we need to write .
+				sem_wait(&sem_write);   // we dont allow any reader if we need to write .// todo: try -sem_trywait here
 			sem_post(&sem_read);
 			
 			int cur_balance = balance_ ;
@@ -152,7 +152,7 @@ account& account::operator=(const account& src){
 	int account::account_get_money (int amount)
 	{	
 	//this method are used for atm transfer money -- the target account don't need password
-		
+
 		sem_wait(&sem_write);
 		usleep(1e6);
 		balance_ += amount ;
