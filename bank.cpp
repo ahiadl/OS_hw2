@@ -66,8 +66,8 @@ void* bank_print_loop(void* bankPtr){
 	{
 		while(1) // todo: i need to use here mutex/semaphores ??
 			{
-				sleep(100);
-				sem_wait(&bank_write);
+				sleep(1);
+				//sem_wait(&bank_write);
 				for (accounts_it = bank::bank_accounts_.begin(); accounts_it != bank::bank_accounts_.end(); ++accounts_it)
 				{
 					int cur_acount_num = accounts_it->first ; 			 //account id (int)
@@ -76,13 +76,13 @@ void* bank_print_loop(void* bankPtr){
 					int cur_balance = cur_acount.account_get_balance(cur_acount_pass);
 
 					int rand_commison = rand() % 4 + 2;
-					unsigned int commison_rate = cur_balance*(rand_commison/100);
+					unsigned int commison_rate = (cur_balance*rand_commison)/100;
 
 					cur_acount.account_withdraw(cur_acount_pass,commison_rate);
 					bank::bank_account_.account_get_money(commison_rate);
-					printf("Bank: commissions of %d were charged, the bank gained %d $ from account %d",rand_commison,commison_rate,cur_acount_num);
+					printf("Bank: commissions of %d were charged, the bank gained %d $ from account %d\n",rand_commison,commison_rate,cur_acount_num);
 				}
-				sem_post(&bank_write);
+				//sem_post(&bank_write);
 			}
 	}
 	
@@ -94,12 +94,12 @@ void* bank_print_loop(void* bankPtr){
 	{
 		sleep(0.5);
 
-        sleep(1);
+        sleep(100);
 
         sem_wait(&bank_read);
         printf("Current Bank Status\n");
         if(reader_count==0){
-        	sem_wait(&bank_write);
+        	sem_trywait(&bank_write);
         }
         reader_count++;
         sem_post(&bank_read);
