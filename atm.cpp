@@ -219,7 +219,6 @@ const vector<string> breakStr (char* src, const char* delim){
 		src_it = associated_bank_->bank_accounts_.find(source_account) ; //get referance pointer to account--need allocation ?
 		tgt_it = associated_bank_->bank_accounts_.find(target_account) ;
 		
-
 		//src_it->second->account_withdraw(password,amount);
 		associated_bank_->bank_accounts_.find(source_account)->second.account_withdraw(password,amount);
 

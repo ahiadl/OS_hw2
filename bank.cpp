@@ -93,10 +93,11 @@ void* bank_print_loop(void* bankPtr){
 		while(1)
 	{
 		sleep(0.5);
-		printf("Current Bank Status\n");
-        sleep(100);
+
+        sleep(1);
 
         sem_wait(&bank_read);
+        printf("Current Bank Status\n");
         if(reader_count==0){
         	sem_wait(&bank_write);
         }
