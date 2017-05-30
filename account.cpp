@@ -109,21 +109,32 @@ account& account::operator=(const account& src){
 		}
 		else   // password match
 		{
+			//cout << "**balance debug**--inside account get balance before sem read wait--start--\n";
 			sem_wait(&sem_read) ;
-
+			//cout << "**balance debug**--inside account get balance after sem read wait--start--\n";
 			if(readers_count_ == 0)
-				sem_wait(&sem_write);   // we dont allow any reader if we need to write .// todo: try -sem_trywait here
+				//cout << "**balance debug**--inside account get balance before sem write wait--start--\n";
+				sem_trywait(&sem_write);   // we dont allow any reader if we need to write .// todo: try -sem_trywait here
+				//cout << "**balance debug**--inside account get balance after sem write wait--start--\n";
 			readers_count_ ++ ;
+			//cout << "**balance debug**--inside account get balance before sem read post--start--\n";
 			sem_post(&sem_read);
+			//cout << "**balance debug**--inside account get balance after sem read post--start--\n";
 			
 			int cur_balance = balance_ ;
 			usleep(1e6);
 			
 			sem_wait(&sem_read) ;
+			//cout << "**balance debug**--inside account get balance after sem read wait --finish--\n";
 			readers_count_ -- ;
-			if(readers_count_ == 0)
+			if(readers_count_ == 0){
+				//cout << "**balance debug**--inside account get balance before sem write post --finish--\n";
 				sem_post(&sem_write);   // we dont allow any reader if we need to write.
+				//cout << "**balance debug**--inside account get balance after sem write post --finish--\n";
+			}
+			//cout << "**balance debug**--inside account get balance before sem read post --finish--\n";
 			sem_post(&sem_read);
+			//cout << "**balance debug**--inside account get balance after sem read post --finish--\n";
 			return cur_balance;
 			
 		}
