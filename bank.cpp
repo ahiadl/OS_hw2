@@ -66,8 +66,10 @@ void* bank_print_loop(void* bankPtr){
 	{
 		while(1) // todo: i need to use here mutex/semaphores ??
 			{
-				sleep(100);
-				//sem_wait(&bank_write);
+				sleep(1);
+//				cout << "***debug**--inside bank take commison--before sem wait\n";
+				sem_wait(&bank_write);
+//				cout << "***debug**--inside bank take commison--after sem wait\n";
 				for (accounts_it = bank::bank_accounts_.begin(); accounts_it != bank::bank_accounts_.end(); ++accounts_it)
 				{
 					int cur_acount_num = accounts_it->first ; 			 //account id (int)
@@ -82,7 +84,9 @@ void* bank_print_loop(void* bankPtr){
 					bank::bank_account_.account_get_money(commison_rate);
 					printf("Bank: commissions of %d were charged, the bank gained %d $ from account %d\n",rand_commison,commison_rate,cur_acount_num);
 				}
-				//sem_post(&bank_write);
+//				cout << "***debug**--inside bank take commison--before sem post\n";
+				sem_post(&bank_write);
+//				cout << "***debug**--inside bank take commison--after sem post\n";
 			}
 	}
 	
@@ -94,7 +98,7 @@ void* bank_print_loop(void* bankPtr){
 	{
 		sleep(0.5);
 
-		sleep(3);
+		sleep(2);
 
         sem_wait(&bank_read);
 

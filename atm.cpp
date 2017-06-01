@@ -69,7 +69,6 @@ const vector<string> breakStr (char* src, const char* delim){
 	{
 		sem_wait(&associated_bank_->bank_write);
 		pthread_mutex_lock(&atm_mutex_);
-		sem_post(&associated_bank_->bank_write);
 
 		account new_account = account(account_num, password, balance);
 
@@ -86,6 +85,8 @@ const vector<string> breakStr (char* src, const char* delim){
         }
 
 		pthread_mutex_unlock(&atm_mutex_);
+		sem_post(&associated_bank_->bank_write);
+
 	}
 
 //*******************************************************************************************************//
@@ -94,7 +95,7 @@ const vector<string> breakStr (char* src, const char* delim){
 	{	
 		sem_wait(&associated_bank_->bank_write);
 		pthread_mutex_lock(&atm_mutex_);
-		sem_post(&associated_bank_->bank_write);
+
 
 		//it = associated_bank_->bank_accounts_.find(account_num) ; //get pointer for the account
 		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id
@@ -114,6 +115,7 @@ const vector<string> breakStr (char* src, const char* delim){
 			}
 		}
 		pthread_mutex_unlock(&atm_mutex_);
+		sem_post(&associated_bank_->bank_write);
 	}
 
 //*******************************************************************************************************//
@@ -122,7 +124,6 @@ const vector<string> breakStr (char* src, const char* delim){
 	{
 		sem_wait(&associated_bank_->bank_write);
 		pthread_mutex_lock(&atm_mutex_);
-		sem_post(&associated_bank_->bank_write);
 
 		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id
 		{
@@ -145,6 +146,8 @@ const vector<string> breakStr (char* src, const char* delim){
 			}
 		}
 		pthread_mutex_unlock(&atm_mutex_);
+		sem_post(&associated_bank_->bank_write);
+
 	}
 
 //*******************************************************************************************************//
@@ -152,15 +155,16 @@ const vector<string> breakStr (char* src, const char* delim){
 	void atm::atm_get_balance (unsigned int account_num , string password)
 	{	
 
-		/*sem_wait(&associated_bank_->bank_read);
+		sem_wait(&associated_bank_->bank_read);
 
 		 //todo: verify that atm can change private bank vat
-		if (associated_bank_->reader_count==0){
+		associated_bank_->reader_count ++ ;
+		if (associated_bank_->reader_count==1){
 			sem_wait(&associated_bank_->bank_write); //todo : try sem_trywait here
 		}
-		associated_bank_->reader_count ++ ;
+
 		sem_post(&associated_bank_->bank_read);
-		*/
+
 		//cout << "**balance debug**--inside atm get balance before lock mutex--\n";
 		pthread_mutex_lock(&atm_mutex_);
 		//cout << "**balance debug**--inside atm get balance after lock mutex--\n";
@@ -174,13 +178,13 @@ const vector<string> breakStr (char* src, const char* delim){
 		//todo: get log massage and return it;
 		}
 		pthread_mutex_unlock(&atm_mutex_);
-		/*readers writer implimtation are in the print status method
+	//	readers writer implimtation are in the print status method
 		sem_wait(&associated_bank_->bank_read);
 		associated_bank_->reader_count -- ;
 		if(associated_bank_->reader_count ==0){
 			sem_post(&associated_bank_->bank_write);
 		}
-		sem_post(&associated_bank_->bank_read);*/
+		sem_post(&associated_bank_->bank_read);
 
 	}
 //*******************************************************************************************************//
@@ -190,7 +194,7 @@ const vector<string> breakStr (char* src, const char* delim){
 	{	
 		sem_wait(&associated_bank_->bank_write);
 		pthread_mutex_lock(&atm_mutex_);
-		sem_post(&associated_bank_->bank_write);
+
 
 		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id
 		{
@@ -202,6 +206,7 @@ const vector<string> breakStr (char* src, const char* delim){
 		//todo: get log massage and return it;
 		}
 		pthread_mutex_unlock(&atm_mutex_);
+		sem_post(&associated_bank_->bank_write);
 	}
 
 //*******************************************************************************************************//
@@ -211,7 +216,7 @@ const vector<string> breakStr (char* src, const char* delim){
 	{
 		sem_wait(&associated_bank_->bank_write);
 		pthread_mutex_lock(&atm_mutex_);
-		sem_post(&associated_bank_->bank_write);
+
 		//associated_bank_->bank_accounts_.find(account_num)->second
 
 		map<unsigned int ,account>::iterator src_it;
@@ -229,6 +234,7 @@ const vector<string> breakStr (char* src, const char* delim){
 		//todo: get log massage and return it;
 		
 		pthread_mutex_unlock(&atm_mutex_);
+		sem_post(&associated_bank_->bank_write);
 	}
 
 
