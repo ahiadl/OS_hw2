@@ -112,11 +112,12 @@ account& account::operator=(const account& src){
 			//cout << "**balance debug**--inside account get balance before sem read wait--start--\n";
 			sem_wait(&sem_read) ;
 			//cout << "**balance debug**--inside account get balance after sem read wait--start--\n";
-			if(readers_count_ == 0)
-				//cout << "**balance debug**--inside account get balance before sem write wait--start--\n";
-				sem_trywait(&sem_write);   // we dont allow any reader if we need to write .// todo: try -sem_trywait here
-				//cout << "**balance debug**--inside account get balance after sem write wait--start--\n";
 			readers_count_ ++ ;
+			if(readers_count_ == 1)
+				//cout << "**balance debug**--inside account get balance before sem write wait--start--\n";
+				sem_wait(&sem_write);   // we dont allow any reader if we need to write .// todo: try -sem_trywait here
+				//cout << "**balance debug**--inside account get balance after sem write wait--start--\n";
+
 			//cout << "**balance debug**--inside account get balance before sem read post--start--\n";
 			sem_post(&sem_read);
 			//cout << "**balance debug**--inside account get balance after sem read post--start--\n";

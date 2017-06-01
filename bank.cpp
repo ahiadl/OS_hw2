@@ -66,7 +66,7 @@ void* bank_print_loop(void* bankPtr){
 	{
 		while(1) // todo: i need to use here mutex/semaphores ??
 			{
-				sleep(1);
+				sleep(100);
 				//sem_wait(&bank_write);
 				for (accounts_it = bank::bank_accounts_.begin(); accounts_it != bank::bank_accounts_.end(); ++accounts_it)
 				{
@@ -98,10 +98,11 @@ void* bank_print_loop(void* bankPtr){
 
         sem_wait(&bank_read);
         printf("Current Bank Status\n");
-        if(reader_count==0){
-        	sem_trywait(&bank_write);
-        }
         reader_count++;
+        if(reader_count == 1 ){
+        	sem_wait(&bank_write);
+        }
+
         sem_post(&bank_read);
 
 		for (accounts_it = bank::bank_accounts_.begin(); accounts_it != bank::bank_accounts_.end(); ++accounts_it)
