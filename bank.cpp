@@ -94,17 +94,17 @@ void* bank_print_loop(void* bankPtr){
 	{
 		sleep(0.5);
 
-        sleep(100);
+		sleep(3);
 
         sem_wait(&bank_read);
-        printf("Current Bank Status\n");
+
         reader_count++;
         if(reader_count == 1 ){
         	sem_wait(&bank_write);
         }
 
         sem_post(&bank_read);
-
+        printf("Current Bank Status\n");
 		for (accounts_it = bank::bank_accounts_.begin(); accounts_it != bank::bank_accounts_.end(); ++accounts_it)
 		{
 

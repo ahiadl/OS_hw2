@@ -13,7 +13,7 @@
             printf("Error %d: Your transaction failed – no account with id %d exists",account);        
             break;
         case  MOUNT_ILLEGAL:
-            printf("Error %d: Your transaction failed – account id %d balance is lower than %d",atm_id,account,amount);
+            printf("Error %d: Your transaction failed – account id %d balance is lower than %d \n",atm_id,account,amount);
             break;
         casr ACCOUNT_ALRDY_EXIST:
             printf("Error %d: Your transaction failed – account with the same id exists",atm_id);
@@ -126,7 +126,7 @@ const vector<string> breakStr (char* src, const char* delim){
 
 		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id
 		{
-			printf("Error %d: Your transaction failed – account id %d does not exist",id_num_,account_num);
+			printf("Error %d: Your transaction failed – account id %d does not exist \n",id_num_,account_num);
 		}
 		else
 		{	
@@ -137,7 +137,7 @@ const vector<string> breakStr (char* src, const char* delim){
 			}
 			else if(new_balance == NEG_ERROR)
 			{
-				printf("Error %d: Your transaction failed – account id %d balance is lower than %d",id_num_,account_num,amount);
+				printf("Error %d: Your transaction failed – account id %d balance is lower than %d \n",id_num_,account_num,amount);
 			}
 			else
 			{
