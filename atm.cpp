@@ -91,45 +91,81 @@ void atm::atm_open_account (actionParams_t* params)
 	
 void atm::atm_deposit (actionParams_t* params)
 {	
-    sem_wait(&associated_bank_->bank_write);
+
+	sem_wait(&associated_bank_->bank_read);
+	&associated_bank_-> reader_count ++;
+	if (&associated_bank_->reader_count == 1) {
+		sem_wait(&associated_bank_->bank_write);
+	}
+	sem_post(&associated_bank_->bank_read);
+	
+
     pthread_mutex_lock(&atm_mutex_);
     int retVal = associated_bank_->deposit_bank(params);
     if (GOOD_OP == retVal) printLog(DEPOSIT_MSG,params);
     else printError(retVal, params);
     pthread_mutex_unlock(&atm_mutex_);
-    sem_post(&associated_bank_->bank_write);
+   
+
+	sem_wait(&associated_bank_->bank_read);
+	&associated_bank_->reader_count--;
+	if (&associated_bank_->reader_count == 0) {
+		sem_post(&associated_bank_->bank_write);
+	}
+	sem_post(&associated_bank_->bank_read);
 }
 
 //*******************************************************************************************************//
 	
 void atm::atm_withdraw (actionParams_t* params)
 {
-    sem_wait(&associated_bank_->bank_write);
+    
+	sem_wait(&associated_bank_->bank_read);
+	&associated_bank_->reader_count++;
+	if (&associated_bank_->reader_count == 1) {
+		sem_wait(&associated_bank_->bank_write);
+	}
+	sem_post(&associated_bank_->bank_read);
+
     pthread_mutex_lock(&atm_mutex_);
     int retVal = associated_bank_->withdraw_bank(params);
     if (GOOD_OP == retVal) printLog(WITHDRAW_MSG,params);
     else printError(retVal, params);
     pthread_mutex_unlock(&atm_mutex_);
     sem_post(&associated_bank_->bank_write);
+
+	sem_wait(&associated_bank_->bank_read);
+	&associated_bank_->reader_count--;
+	if (&associated_bank_->reader_count == 0) {
+		sem_post(&associated_bank_->bank_write);
+	}
+	sem_post(&associated_bank_->bank_read);
+
 }
 
 //*******************************************************************************************************//
 	
 void atm::atm_get_balance (actionParams_t* params)
 {	
-    sem_wait(&associated_bank_->bank_read);
-    associated_bank_->reader_count ++ ;
-    if (associated_bank_->reader_count==1) sem_wait(&associated_bank_->bank_write);
-    sem_post(&associated_bank_->bank_read);
+	sem_wait(&associated_bank_->bank_read);
+	&associated_bank_->reader_count++;
+	if (&associated_bank_->reader_count == 1) {
+		sem_wait(&associated_bank_->bank_write);
+	}
+	sem_post(&associated_bank_->bank_read);
+
     pthread_mutex_lock(&atm_mutex_);
     int retVal = associated_bank_->get_balance_bank(params);
     if (GOOD_OP == retVal) printLog(BALANCE_MSG,params);
     else printError(retVal, params);
     pthread_mutex_unlock(&atm_mutex_);
-    sem_wait(&associated_bank_->bank_read);
-    associated_bank_->reader_count -- ;
-    if(associated_bank_->reader_count ==0) sem_post(&associated_bank_->bank_write);
-    sem_post(&associated_bank_->bank_read);
+
+	sem_wait(&associated_bank_->bank_read);
+	&associated_bank_->reader_count--;
+	if (&associated_bank_->reader_count == 0) {
+		sem_post(&associated_bank_->bank_write);
+	}
+	sem_post(&associated_bank_->bank_read);
 
 }
 //*******************************************************************************************************//
@@ -148,13 +184,26 @@ void atm::atm_close_account (actionParams_t* params)
 //*******************************************************************************************************//
 void atm::atm_transfer_money (actionParams_t* params)
 {
-    sem_wait(&associated_bank_->bank_write);
+	sem_wait(&associated_bank_->bank_read);
+	&associated_bank_->reader_count++;
+	if (&associated_bank_->reader_count == 1) {
+		sem_wait(&associated_bank_->bank_write);
+	}
+	sem_post(&associated_bank_->bank_read);
+
     pthread_mutex_lock(&atm_mutex_);
     int retVal = associated_bank_->transfer_money_bank(params);
     if (GOOD_OP == retVal) printLog(TRANSFER_MSG,params);
     else printError(retVal, params);
     pthread_mutex_unlock(&atm_mutex_);
     sem_post(&associated_bank_->bank_write);
+
+	sem_wait(&associated_bank_->bank_read);
+	&associated_bank_->reader_count--;
+	if (&associated_bank_->reader_count == 0) {
+		sem_post(&associated_bank_->bank_write);
+	}
+	sem_post(&associated_bank_->bank_read);
 }
 
 //*******************************************************************************************************//

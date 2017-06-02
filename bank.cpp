@@ -79,10 +79,14 @@ void* bank::print_status()
 	while(1){
 		sleep(0.5);
 
-        	sem_wait(&bank_read);
-        	reader_count++;
-        	if(reader_count == 1 ) sem_wait(&bank_write);
-        	sem_post(&bank_read);
+       /* sem_wait(&bank_read);
+        reader_count++;
+		if (reader_count == 1) {
+			sem_wait(&bank_write);
+		}
+        sem_post(&bank_read);*/
+
+		sem_wait(&bank_write);
 
 		printf("Current Bank Status\n");
 		for (accounts_it = bank_accounts_.begin(); accounts_it != bank_accounts_.end(); ++accounts_it)
@@ -101,10 +105,14 @@ void* bank::print_status()
         bank_account_.account_get_balance(&params);
 		printf("The Bank has %d $\n",params.balance);
 	
-	    sem_wait(&bank_read);
+		sem_post(&bank_write);
+
+	    /*sem_wait(&bank_read);
 	    reader_count--;
-	    if(reader_count==0) sem_post(&bank_write);
-	    sem_post(&bank_read);
+	    if(reader_count==0) {
+			sem_post(&bank_write);
+		}
+	    sem_post(&bank_read);*/
     }
 }
 
