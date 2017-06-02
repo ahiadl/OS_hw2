@@ -106,14 +106,17 @@ account& account::operator=(const account& src){
         }
 		else   // password match
 		{	
-            cout<<"before locking\n";
+	        cout << "**debug**--account get balance--before read wait--entry\n";
 			sem_wait(&sem_read);
 			readers_count_ ++ ;
-            cout << "before waiting";
+            cout << "**debug**--account get balance--after read wait--entry\n";
 			if(readers_count_ == 1)
+				 cout << "**debug**--account get balance--before write wait--entry\n";
 				sem_wait(&sem_write);
-            cout << "before post\n" ;  // we dont allow any reader if we need to write .// todo: try -sem_trywait here
+				 cout << "**debug**--account get balance--after read wait--entry\n";
+		    cout << "**debug**--account get balance--before read post--entry\n";
 			sem_post(&sem_read);
+			cout << "**debug**--account get balance--after read post--entry\n";
 			
 			params->balance = balance_;
 			usleep(1e6);

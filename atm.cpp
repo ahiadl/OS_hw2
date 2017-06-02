@@ -93,8 +93,8 @@ void atm::atm_deposit (actionParams_t* params)
 {	
 
 	sem_wait(&associated_bank_->bank_read);
-	&associated_bank_-> reader_count ++;
-	if (&associated_bank_->reader_count == 1) {
+	associated_bank_-> reader_count ++;
+	if (associated_bank_->reader_count == 1) {
 		sem_wait(&associated_bank_->bank_write);
 	}
 	sem_post(&associated_bank_->bank_read);
@@ -108,8 +108,8 @@ void atm::atm_deposit (actionParams_t* params)
    
 
 	sem_wait(&associated_bank_->bank_read);
-	&associated_bank_->reader_count--;
-	if (&associated_bank_->reader_count == 0) {
+	associated_bank_->reader_count--;
+	if (associated_bank_->reader_count == 0) {
 		sem_post(&associated_bank_->bank_write);
 	}
 	sem_post(&associated_bank_->bank_read);
@@ -121,8 +121,8 @@ void atm::atm_withdraw (actionParams_t* params)
 {
     
 	sem_wait(&associated_bank_->bank_read);
-	&associated_bank_->reader_count++;
-	if (&associated_bank_->reader_count == 1) {
+	associated_bank_->reader_count++;
+	if (associated_bank_->reader_count == 1) {
 		sem_wait(&associated_bank_->bank_write);
 	}
 	sem_post(&associated_bank_->bank_read);
@@ -135,8 +135,8 @@ void atm::atm_withdraw (actionParams_t* params)
     sem_post(&associated_bank_->bank_write);
 
 	sem_wait(&associated_bank_->bank_read);
-	&associated_bank_->reader_count--;
-	if (&associated_bank_->reader_count == 0) {
+	associated_bank_->reader_count--;
+	if (associated_bank_->reader_count == 0) {
 		sem_post(&associated_bank_->bank_write);
 	}
 	sem_post(&associated_bank_->bank_read);
@@ -148,8 +148,8 @@ void atm::atm_withdraw (actionParams_t* params)
 void atm::atm_get_balance (actionParams_t* params)
 {	
 	sem_wait(&associated_bank_->bank_read);
-	&associated_bank_->reader_count++;
-	if (&associated_bank_->reader_count == 1) {
+	associated_bank_->reader_count++;
+	if (associated_bank_->reader_count == 1) {
 		sem_wait(&associated_bank_->bank_write);
 	}
 	sem_post(&associated_bank_->bank_read);
@@ -161,8 +161,8 @@ void atm::atm_get_balance (actionParams_t* params)
     pthread_mutex_unlock(&atm_mutex_);
 
 	sem_wait(&associated_bank_->bank_read);
-	&associated_bank_->reader_count--;
-	if (&associated_bank_->reader_count == 0) {
+	associated_bank_->reader_count--;
+	if (associated_bank_->reader_count == 0) {
 		sem_post(&associated_bank_->bank_write);
 	}
 	sem_post(&associated_bank_->bank_read);
@@ -185,8 +185,8 @@ void atm::atm_close_account (actionParams_t* params)
 void atm::atm_transfer_money (actionParams_t* params)
 {
 	sem_wait(&associated_bank_->bank_read);
-	&associated_bank_->reader_count++;
-	if (&associated_bank_->reader_count == 1) {
+	associated_bank_->reader_count++;
+	if (associated_bank_->reader_count == 1) {
 		sem_wait(&associated_bank_->bank_write);
 	}
 	sem_post(&associated_bank_->bank_read);
@@ -199,8 +199,8 @@ void atm::atm_transfer_money (actionParams_t* params)
     sem_post(&associated_bank_->bank_write);
 
 	sem_wait(&associated_bank_->bank_read);
-	&associated_bank_->reader_count--;
-	if (&associated_bank_->reader_count == 0) {
+	associated_bank_->reader_count--;
+	if (associated_bank_->reader_count == 0) {
 		sem_post(&associated_bank_->bank_write);
 	}
 	sem_post(&associated_bank_->bank_read);

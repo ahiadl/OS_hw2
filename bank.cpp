@@ -52,11 +52,15 @@ void* bank_print_loop(void* bankPtr){
     void* bank::take_commission()
 	{
         actionParams_t params;        
+        params.isDstBank=1;
 		while(1){ // todo: i need to use here mutex/semaphores ??
-			sleep(3);
+			sleep(1);
+			cout<<"\n*debug*--in bank take commisson--before bank_write wait\n";
 		    sem_wait(&bank_write);
+			cout<<"\n*debug*--in bank take commisson--after bank_write wait\n";
 			for (accounts_it = bank::bank_accounts_.begin(); accounts_it != bank::bank_accounts_.end(); ++accounts_it)
 			{
+					cout<<"\n!*debug*!--in bank take commisson--entry to the for\n";
 				    params.accountNum  = accounts_it->first ; 	    //account id (int)
 					account cur_acount = accounts_it->second	;	//account pointer (pointer)
 					params.password = cur_acount.password_;
@@ -64,10 +68,19 @@ void* bank_print_loop(void* bankPtr){
 					int rand_commison = rand() % 4 + 2;
                     params.tranAmount = params.balance*(rand_commison/100);
                     params.targetAccount = bank_account_num; 
+
+                    cout<<"\n!*debug*!--in bank take commisson--before the transfer money\n";
 					transfer_money_bank(&params);
+					cout<<"\n!*debug*!--in bank take commisson--after the transfer money\n";
+//                    cur_acount.account_withdraw(&params);
+//                    bank::bank_account_.account_get_money(&params);
+
 					printf("Bank: commissions of %d were charged, the bank gained %d $ from account %d",rand_commison,params.tranAmount,params.accountNum);
-		    }
+					cout<<"\n!*debug*!--in bank take commisson--finish of the for\n";
+			}
+			cout<<"\n*debug*--in bank take commisson--before bank_write post\n";
 		    sem_post(&bank_write);
+			cout<<"\n*debug*--in bank take commisson--after bank_write post\n";
 		}
 	}
 	
@@ -77,7 +90,7 @@ void* bank::print_status()
 {
     actionParams_t params;
 	while(1){
-		sleep(0.5);
+		sleep(100);
 
        /* sem_wait(&bank_read);
         reader_count++;
