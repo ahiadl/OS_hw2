@@ -7,22 +7,22 @@ void printLog(int msg_code, actionParams_t* params){
     logFile.open("log.txt",std::ios::app|std::ios::out);
     switch(msg_code){
         case OPEN_MSG:
-            logFile << params->atmNum <<": New aacount id is "<< params->accountNum <<" with password "<< params->password << " and initial balance "<<params->balance <<"\n";
+            /*logFile*/cout << params->atmNum <<": New aacount id is "<< params->accountNum <<" with password "<< params->password << " and initial balance "<<params->balance <<"\n";
             break;
         case DEPOSIT_MSG:
-            logFile << params->atmNum <<": Account "<< params->accountNum <<" new balance is "<< params->balance << " after "<<params->amount << " $ was deposited\n";
+            /*logFile*/cout << params->atmNum <<": Account "<< params->accountNum <<" new balance is "<< params->balance << " after "<<params->amount << " $ was deposited\n";
             break;
         case WITHDRAW_MSG:
-            logFile << params->atmNum <<": Account "<< params->accountNum <<" new balance is "<< params->balance << " after "<<params->amount << " $ was withdrew\n";
+            /*logFile*/ cout << params->atmNum <<": Account "<< params->accountNum <<" new balance is "<< params->balance << " after "<<params->amount << " $ was withdrew\n";
             break;
         case BALANCE_MSG:  
-            logFile << params->atmNum <<": Account "<< params->accountNum <<" balance is "<< params->balance << "\n";
+            /*logFile*/cout << params->atmNum <<": Account "<< params->accountNum <<" balance is "<< params->balance << "\n";
             break;
         case CLOSE_MSG:  
-            logFile << params->atmNum <<": Account "<< params->accountNum <<"is now closed. Balance was " << params->balance <<"\n";
+            cout/*logFile*/ << params->atmNum <<": Account "<< params->accountNum <<"is now closed. Balance was " << params->balance <<"\n";
             break;
         case TRANSFER_MSG: 
-            logFile << params->atmNum <<": Transfer "<< params->tranAmount <<"from account "<< params->accountNum <<" to account "<< params->targetAccount <<". new account balance is " <<params->balance <<" new target account balance "<< params->dstBalance << "\n";
+            /*logFile*/cout << params->atmNum <<": Transfer "<< params->tranAmount <<"from account "<< params->accountNum <<" to account "<< params->targetAccount <<". new account balance is " <<params->balance <<" new target account balance "<< params->dstBalance << "\n";
             break;
         default: break;
     }
@@ -252,6 +252,7 @@ void* atm_main_loop(void* atmParamsLocal){//int atmNum, pBank bankInst,char cons
         if(DEBUG)cout << "*debug -inside atm main loop before the main while" << "\n" ;
         while(std::getline(infile,line)){
                 istringstream isl(line);
+                if (line.empty()) continue;
                 vector<string> lineCmd{istream_iterator<string>{isl}, istream_iterator<string>{}}; 		
                 if(DEBUG)cout << "**debug -inside atm main loop inside! the main while --line param is:"<<line << "\n" ;       
                 params.accountNum = atoi(lineCmd[1].c_str());
