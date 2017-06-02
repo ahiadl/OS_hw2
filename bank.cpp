@@ -145,7 +145,7 @@ int bank::close_account_bank(actionParams_t* params){
         return ACCOUNT_NOT_EXIST;                                                              	
     else{                                                                                       	
         int rc = bank_accounts_.find(params->accountNum)->second.account_close(params);
-        if (GOOD_OP == rc) bank_accounts_.erase(params->accountNum);
+        if (GOOD_OP == rc) bank_accounts_.erase(bank_accounts_.find(params->accountNum));
         return rc;
     }
 }

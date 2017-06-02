@@ -291,5 +291,6 @@ void* atm_main_loop(void* atmParamsLocal){//int atmNum, pBank bankInst,char cons
                 usleep(100000);
         }
         delete(actionFile);
+        cout << "Done atm loopi\n";
         return NULL;
     }

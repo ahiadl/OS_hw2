@@ -70,8 +70,10 @@ int main (int argc, const char* argv[])
     }
     if(DEBUG_MAIN) cout << "debug- in main after bank threads create" << "\n" ;
     int atmWait;     
-    for (atmWait = 0; atmWait < numOfAtm+2; atmWait++)
-      pthread_join(atmsThreads[atmWait],NULL);
+    for (atmWait = 0; atmWait < numOfAtm; atmWait++){
+        pthread_join(atmsThreads[atmWait],NULL);
+        cout << "Joined all threads\n";
+    }
     pthread_cancel(bankThreads[0]); 
     pthread_cancel(bankThreads[1]);
     return 0; 
