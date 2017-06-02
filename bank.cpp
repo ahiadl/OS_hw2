@@ -13,14 +13,31 @@
 
 void* bank_main_loop (void* bankPtr){
     pBank ourBank = (pBank)bankPtr;
-    ourBank->take_commission();
+    while(1){
+        sleep(3);
+         if(DEBUG) cout << "Locking commision sem\n";
+        sem_wait(&ourBank->bank_write);
+         if(DEBUG) cout << "Locked commision sem\n";
+        ourBank->take_commission();
+         if(DEBUG) cout << "releasing commision sem\n";
+        sem_post(&ourBank->bank_write);
+         if(DEBUG) cout << "released commision sem\n";
+    }
     return NULL;
-
 }
 
 void* bank_print_loop(void* bankPtr){
     pBank ourBank = (pBank)bankPtr;
-    ourBank->print_status();
+    while(1){
+	    sleep(0.5);
+         if(DEBUG) cout << "Locking print sem\n";
+        sem_wait(&ourBank->bank_write);
+         if(DEBUG) cout << "Locked print sem\n";
+        ourBank->print_status();
+         if(DEBUG) cout << "releasing print sem\n";
+        sem_post(&ourBank->bank_write);
+         if(DEBUG) cout << "released print sem\n";
+    }
     return NULL;
 }
 
@@ -41,93 +58,63 @@ void* bank_print_loop(void* bankPtr){
     
 	int bank::openAccount(actionParams_t *params)
 	{
-		if (bank_accounts_.end() == bank_accounts_.find(params->accountNum)){
+		 if(DEBUG) cout<<"inside bank open account\n";
+        if (bank_accounts_.end() == bank_accounts_.find(params->accountNum)){
             account new_account = account(params->accountNum, params->password, params->balance);
 			bank_accounts_.insert(pair<unsigned int ,account>(params->accountNum,new_account));
 			return GOOD_OP;
-		}else
-            return ACCOUNT_ALRDY_EXIST;
+		}
+        if(DEBUG) cout << "done bank open account\n";
+        return ACCOUNT_ALRDY_EXIST;
 	}
 //**************************************************************************************//	
-    void* bank::take_commission()
+    void bank::take_commission()
 	{
-        actionParams_t params;        
+        actionParams_t params;       
         params.isDstBank=1;
-		while(1){ // todo: i need to use here mutex/semaphores ??
-			sleep(1);
-			cout<<"\n*debug*--in bank take commisson--before bank_write wait\n";
-		    sem_wait(&bank_write);
-			cout<<"\n*debug*--in bank take commisson--after bank_write wait\n";
-			for (accounts_it = bank::bank_accounts_.begin(); accounts_it != bank::bank_accounts_.end(); ++accounts_it)
-			{
-					cout<<"\n!*debug*!--in bank take commisson--entry to the for\n";
-				    params.accountNum  = accounts_it->first ; 	    //account id (int)
-					account cur_acount = accounts_it->second	;	//account pointer (pointer)
-					params.password = cur_acount.password_;
-					cur_acount.account_get_balance(&params);
-					int rand_commison = rand() % 4 + 2;
-                    params.tranAmount = params.balance*(rand_commison/100);
-                    params.targetAccount = bank_account_num; 
-
-                    cout<<"\n!*debug*!--in bank take commisson--before the transfer money\n";
-					transfer_money_bank(&params);
-					cout<<"\n!*debug*!--in bank take commisson--after the transfer money\n";
-//                    cur_acount.account_withdraw(&params);
-//                    bank::bank_account_.account_get_money(&params);
-
-					printf("Bank: commissions of %d were charged, the bank gained %d $ from account %d",rand_commison,params.tranAmount,params.accountNum);
-					cout<<"\n!*debug*!--in bank take commisson--finish of the for\n";
-			}
-			cout<<"\n*debug*--in bank take commisson--before bank_write post\n";
-		    sem_post(&bank_write);
-			cout<<"\n*debug*--in bank take commisson--after bank_write post\n";
-		}
+        std::ofstream logFile;
+        logFile.open("log.txt",std::ios::app|std::ios::out);
+	    for (accounts_it = bank::bank_accounts_.begin(); accounts_it != bank::bank_accounts_.end(); ++accounts_it)
+	    {
+		    params.accountNum  = accounts_it->first ; 	    //account id (int)
+			account cur_acount = accounts_it->second	;	//account pointer (pointer)
+			params.password = cur_acount.password_;
+			cur_acount.account_get_balance(&params);
+			int rand_commison = rand() % 4 + 2;
+            params.tranAmount = (params.balance*rand_commison)/100;
+            params.targetAccount = bank_account_num;
+			transfer_money_bank(&params);
+			logFile << "Bank: commissions of " <<rand_commison<<" were charged, the bank gained "<< params.tranAmount << " $ from account " << params.accountNum << "\n";
+	    }
+        logFile.close();
 	}
 	
 //**************************************************************************************//
 
-void* bank::print_status()
+void bank::print_status()
 {
     actionParams_t params;
-	while(1){
-		sleep(100);
+    printf("\033[2J");
+    printf("\033[1;1H");
+	printf("Current Bank Status\n");
+	for (accounts_it = bank_accounts_.begin(); accounts_it != bank_accounts_.end(); ++accounts_it)
+	{
+		if(DEBUG) cout << "Start print Iteration\n";
+        params.accountNum = accounts_it->first ;		 //account id (int)
+		account cur_acount = accounts_it->second ;		 //account pointer (pointer)
+		params.password = cur_acount.password_ ;
+		get_balance_bank(&params);
+		printf("Account %d: Balance – %d $ , Account Password – %s\n",params.accountNum,params.balance,params.password.c_str());
+	}
+    if(DEBUG) cout<<"DONE print Iterations\n";
+	params.accountNum = bank_account_num; 
+    params.password= bank_pass;
+    if(DEBUG) cout << "printing bank balance \n";
+    //bank_account_.account_get_balance(&params);
+	printf("The Bank has %d $\n",params.balance);
 
-       /* sem_wait(&bank_read);
-        reader_count++;
-		if (reader_count == 1) {
-			sem_wait(&bank_write);
-		}
-        sem_post(&bank_read);*/
-
-		sem_wait(&bank_write);
-
-		printf("Current Bank Status\n");
-		for (accounts_it = bank_accounts_.begin(); accounts_it != bank_accounts_.end(); ++accounts_it)
-		{
-			if(DEBUG_BANK) cout << "Start print Iteration\n";
-            params.accountNum = accounts_it->first ;		 //account id (int)
-			account cur_acount = accounts_it->second ;		 //account pointer (pointer)
-			params.password = cur_acount.password_ ;
-			get_balance_bank(&params);
-			printf("Account %d: Balance – %d $ , Account Password – %s\n",params.accountNum,params.balance,params.password.c_str());
-		}
-        if(DEBUG_BANK) cout<<"DONE print Iterations\n";
-		params.accountNum = bank_account_num; 
-        params.password= bank_pass;
-        if(DEBUG_BANK) cout << "printing bank balance \n";
-        bank_account_.account_get_balance(&params);
-		printf("The Bank has %d $\n",params.balance);
-	
-		sem_post(&bank_write);
-
-	    /*sem_wait(&bank_read);
-	    reader_count--;
-	    if(reader_count==0) {
-			sem_post(&bank_write);
-		}
-	    sem_post(&bank_read);*/
-    }
 }
+
 
 
 //**************************************************************************************//
@@ -164,19 +151,25 @@ int bank::close_account_bank(actionParams_t* params){
 }
 
 int bank::transfer_money_bank(actionParams_t* params){
+    if(DEBUG)cout << "inside transfer money\n";
     map<unsigned int ,account>::iterator src_it;
     map<unsigned int ,account>::iterator tgt_it;
     if (!params->isDstBank){
         tgt_it = bank_accounts_.find(params->targetAccount) ;
     }
+    if(DEBUG)cout<< "before serching for dst in map\n";
     src_it = bank_accounts_.find(params->accountNum) ; //get referance pointer to account--need allocation ?
+    if(DEBUG)cout << "after searching src in map\n";
     if ((bank_accounts_.end() == src_it) || (bank_accounts_.end() == src_it)) 
         return ACCOUNT_NOT_EXIST;                                                              	
     else{
+        if(DEBUG)cout << "before withdraw\n";
         params->amount = params->tranAmount;        
         int rc = withdraw_bank(params);
+        if(DEBUG)cout << "before get money\n";
         if(GOOD_OP != rc) return rc;
-        rc = (params->isDstBank) ? bank_account_.account_get_money(params):  tgt_it->second.account_get_money(params);
+        rc = (params->isDstBank) ? bank_account_.account_get_money(params) : tgt_it->second.account_get_money(params);
+        if(DEBUG)cout << "done transfer bank\n";
         return rc;
     }
 }

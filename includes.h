@@ -7,7 +7,7 @@
 
 #ifndef INCLUDES_H_
 #define INCLUDES_H_
-
+#define DEBUG 0 
 #include <map>
 #include <vector>
 #include <string>

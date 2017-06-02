@@ -47,6 +47,8 @@ account& account::operator=(const account& src){
    this->account_num_ = src.account_num_;
    this->password_ = src.password_;
    this->balance_ = src.balance_; 
+   this->sem_read = src.sem_read;
+   this->sem_write = src.sem_write;
    return *this;
 }
 //**********************************************************************************************************//		
@@ -99,36 +101,33 @@ account& account::operator=(const account& src){
 	int account::account_get_balance (actionParams_t* params)
 	{	
 		//string log ; 
-        cout << "inside  get balance\n";
+        if(DEBUG) cout << "inside  get balance\n";
 		if(password_ != params->password)
         {
             return WRONG_PASSWORD;		
         }
 		else   // password match
 		{	
-	        cout << "**debug**--account get balance--before read wait--entry\n";
+            if(DEBUG) cout<<"before locking\n";
 			sem_wait(&sem_read);
 			readers_count_ ++ ;
-            cout << "**debug**--account get balance--after read wait--entry\n";
+            if(DEBUG) cout << "before waiting";
 			if(readers_count_ == 1)
-				 cout << "**debug**--account get balance--before write wait--entry\n";
 				sem_wait(&sem_write);
-				 cout << "**debug**--account get balance--after read wait--entry\n";
-		    cout << "**debug**--account get balance--before read post--entry\n";
+            if(DEBUG) cout << "before post\n" ;  // we dont allow any reader if we need to write .// todo: try -sem_trywait here
 			sem_post(&sem_read);
-			cout << "**debug**--account get balance--after read post--entry\n";
 			
 			params->balance = balance_;
 			usleep(1e6);
 			
-			cout << "done claulating balance\n";
+			if(DEBUG) cout << "done claulating balance\n";
             sem_wait(&sem_read) ;
 			readers_count_ -- ;
-            cout <<"after waiting\n";
+            if(DEBUG) cout <<"after waiting\n";
 			if(readers_count_ == 0)	sem_post(&sem_write);   // we dont allow any reader if we need to write.
-            cout << "after second post\n";
+            if(DEBUG) cout << "after second post\n";
             sem_post(&sem_read);
-            cout<< "done get balance\n";
+            if(DEBUG) cout<< "done get balance\n";
 			return GOOD_OP;
 			
 		}

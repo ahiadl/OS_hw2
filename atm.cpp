@@ -77,14 +77,17 @@ atm::atm (pBank associated_bank ,int id_num)
 //*******************************************************************************************************//
 	
 void atm::atm_open_account (actionParams_t* params)
-{
+{    if(DEBUG) cout << "locking open sem\n";
     sem_wait(&associated_bank_->bank_write);
+     if(DEBUG) cout << "locked open sem\n";
     pthread_mutex_lock(&atm_mutex_);
     int retVal = associated_bank_->openAccount(params);
     if (GOOD_OP == retVal) printLog(OPEN_MSG, params);
     else printError(retVal,params);
     pthread_mutex_unlock(&atm_mutex_);
+     if(DEBUG) cout << "releasing open sem\n";
     sem_post(&associated_bank_->bank_write);
+     if(DEBUG) cout << "released open sem\n";
 }
 
 //*******************************************************************************************************//

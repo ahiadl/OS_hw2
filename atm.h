@@ -2,7 +2,7 @@
 #define atm_H_
 
 #define MAX_LINE_SIZE 256
-#define DEBUG 0 
+
 
 void* atm_main_loop(void* atmParamsiLocal);
 
