@@ -52,6 +52,7 @@ class actionParams_t{
         unsigned int targetAccount;
         int atmNum;
         int dstBalance;
+        int isDstBank;
 };
 
 #define BANLK_ACCOUNT_NUM 987889898

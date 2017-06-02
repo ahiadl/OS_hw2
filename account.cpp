@@ -99,30 +99,33 @@ account& account::operator=(const account& src){
 	int account::account_get_balance (actionParams_t* params)
 	{	
 		//string log ; 
-		if(password_ != params->password) //todo : bad password, handle this case  
-		{
-			 return WRONG_PASSWORD;
-		}
+        cout << "inside  get balance\n";
+		if(password_ != params->password)
+        {
+            return WRONG_PASSWORD;		
+        }
 		else   // password match
 		{	
-			sem_wait(&sem_read) ;
+            cout<<"before locking\n";
+			sem_wait(&sem_read);
 			readers_count_ ++ ;
+            cout << "before waiting";
 			if(readers_count_ == 1)
-				//cout << "**balance debug**--inside account get balance before sem write wait--start--\n";
-				sem_wait(&sem_write);   // we dont allow any reader if we need to write .// todo: try -sem_trywait here
-				//cout << "**balance debug**--inside account get balance after sem write wait--start--\n";
-
-			//cout << "**balance debug**--inside account get balance before sem read post--start--\n";
+				sem_wait(&sem_write);
+            cout << "before post\n" ;  // we dont allow any reader if we need to write .// todo: try -sem_trywait here
 			sem_post(&sem_read);
 			
 			params->balance = balance_;
 			usleep(1e6);
 			
-			sem_wait(&sem_read) ;
+			cout << "done claulating balance\n";
+            sem_wait(&sem_read) ;
 			readers_count_ -- ;
-			if(readers_count_ == 0)
-				sem_post(&sem_write);   // we dont allow any reader if we need to write.
-			sem_post(&sem_read);
+            cout <<"after waiting\n";
+			if(readers_count_ == 0)	sem_post(&sem_write);   // we dont allow any reader if we need to write.
+            cout << "after second post\n";
+            sem_post(&sem_read);
+            cout<< "done get balance\n";
 			return GOOD_OP;
 			
 		}

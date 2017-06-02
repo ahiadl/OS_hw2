@@ -28,15 +28,11 @@ void* bank_print_loop(void* bankPtr){
 
 	bank::bank(unsigned int account_num , string password , int balance)
 	{   
-        if(DEBUG_BANK) cout << "started ctor\n";
     	bank_pass = password ;
 		bank_account_num = account_num ;
 		bal = balance ;
-        if(DEBUG_BANK) cout << "done set parameters\n";
 		account temp(bank_account_num,bank_pass ,bal);
-        if(DEBUG_BANK) cout << "done creating temp accoutn\n";
         bank_account_ = temp;
-        if(DEBUG_BANK) cout << "done ctor\n";
         sem_init(&bank_write,1,1) ;
 		sem_init(&bank_read,1,1) ;
 		reader_count = 0 ;
@@ -57,10 +53,10 @@ void* bank_print_loop(void* bankPtr){
 	{
         actionParams_t params;        
 		while(1){ // todo: i need to use here mutex/semaphores ??
-				sleep(3);
-				sem_wait(&bank_write);
-				for (accounts_it = bank::bank_accounts_.begin(); accounts_it != bank::bank_accounts_.end(); ++accounts_it)
-				{
+			sleep(3);
+		    sem_wait(&bank_write);
+			for (accounts_it = bank::bank_accounts_.begin(); accounts_it != bank::bank_accounts_.end(); ++accounts_it)
+			{
 				    params.accountNum  = accounts_it->first ; 	    //account id (int)
 					account cur_acount = accounts_it->second	;	//account pointer (pointer)
 					params.password = cur_acount.password_;
@@ -70,8 +66,8 @@ void* bank_print_loop(void* bankPtr){
                     params.targetAccount = bank_account_num; 
 					transfer_money_bank(&params);
 					printf("Bank: commissions of %d were charged, the bank gained %d $ from account %d",rand_commison,params.tranAmount,params.accountNum);
-				}
-		sem_post(&bank_write);
+		    }
+		    sem_post(&bank_write);
 		}
 	}
 	
@@ -105,10 +101,10 @@ void* bank::print_status()
         bank_account_.account_get_balance(&params);
 		printf("The Bank has %d $\n",params.balance);
 	
-	sem_wait(&bank_read);
-	reader_count--;
-	if(reader_count==0) sem_post(&bank_write);
-	sem_post(&bank_read);
+	    sem_wait(&bank_read);
+	    reader_count--;
+	    if(reader_count==0) sem_post(&bank_write);
+	    sem_post(&bank_read);
     }
 }
 
@@ -149,15 +145,19 @@ int bank::close_account_bank(actionParams_t* params){
 int bank::transfer_money_bank(actionParams_t* params){
     map<unsigned int ,account>::iterator src_it;
     map<unsigned int ,account>::iterator tgt_it;
+    if (!params->isDstBank){
+        tgt_it = bank_accounts_.find(params->targetAccount) ;
+    }
     src_it = bank_accounts_.find(params->accountNum) ; //get referance pointer to account--need allocation ?
-    tgt_it = bank_accounts_.find(params->targetAccount) ;
     if ((bank_accounts_.end() == src_it) || (bank_accounts_.end() == src_it)) 
         return ACCOUNT_NOT_EXIST;                                                              	
-    else
+    else{
         params->amount = params->tranAmount;        
         int rc = withdraw_bank(params);
         if(GOOD_OP != rc) return rc;
-        return tgt_it->second.account_get_money(params);
+        rc = (params->isDstBank) ? bank_account_.account_get_money(params):  tgt_it->second.account_get_money(params);
+        return rc;
+    }
 }
 
 
