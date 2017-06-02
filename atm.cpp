@@ -1,54 +1,65 @@
-//atm.cpp 
-
+#include "includes.h"
+#include "bank.h"
 #include "atm.h"
-//!!!! todo: i need t understand how the input gotten by the bank and deliverd to the atm 
-//may be class of argument that the bank handle ?
 
-/*void printError(int error_code, int atm_id, int account, int bal, int amount){
-    switch(error_code){
-        case WRONG_PASSWORD:
-            printf("Error %d: Your transaction failed – account id %d does not exist\n",atm_id, account);
+void printLog(int msg_code, actionParams_t* params){
+    std::ofstream logFile;
+    logFile.open("log.txt",std::ios::app|std::ios::out);
+    switch(msg_code){
+        case OPEN_MSG:
+            logFile << params->atmNum <<": New aacount id is "<< params->accountNum <<" with password "<< params->password << " and initial balance "<<params->balance <<"\n";
             break;
-        case ACCOUNT_NOT_EXIST:
-            printf("Error %d: Your transaction failed – no account with id %d exists",account);        
+        case DEPOSIT_MSG:
+            logFile << params->atmNum <<": Account "<< params->accountNum <<" new balance is "<< params->balance << " after "<<params->amount << " $ was deposited\n";
             break;
-        case  MOUNT_ILLEGAL:
-            printf("Error %d: Your transaction failed – account id %d balance is lower than %d \n",atm_id,account,amount);
+        case WITHDRAW_MSG:
+            logFile << params->atmNum <<": Account "<< params->accountNum <<" new balance is "<< params->balance << " after "<<params->amount << " $ was withdrew\n";
             break;
-        casr ACCOUNT_ALRDY_EXIST:
-            printf("Error %d: Your transaction failed – account with the same id exists",atm_id);
+        case BALANCE_MSG:  
+            logFile << params->atmNum <<": Account "<< params->accountNum <<" balance is "<< params->balance << "\n";
+            break;
+        case CLOSE_MSG:  
+            logFile << params->atmNum <<": Account "<< params->accountNum <<"is now closed. Balance was " << params->balance <<"\n";
+            break;
+        case TRANSFER_MSG: 
+            logFile << params->atmNum <<": Transfer "<< params->tranAmount <<"from account "<< params->accountNum <<" to account "<< params->targetAccount <<". new account balance is " <<params->balance <<" new target account balance "<< params->dstBalance << "\n";
             break;
         default: break;
     }
-}*/
-
-
-
-const vector<string> breakStr (char* src, const char* delim){
-    char* token = std::strtok(src, delim);
-    vector<string> brokenStr;
-    int i = 0;
-    while(token != NULL){
-        brokenStr.push_back(token);
-        i++;
-        token = std::strtok(NULL, delim);
-    }
-    return brokenStr;
+    logFile.close();
 }
 
 
-
-
+void printError(int error_code, actionParams_t* params){
+    std::ofstream logFile;
+    logFile.open("log.txt",std::ios::app|std::ios::out);
+    switch(error_code){
+        case WRONG_PASSWORD:
+            logFile <<"Error " << params->atmNum <<": Your transaction failed – password for account "<< params->accountNum << " is incorrect\n";
+            break;
+        case ACCOUNT_NOT_EXIST:
+            logFile << "Error "<< params->atmNum <<": Your transaction failed – account id "<< params->accountNum << " does not exists\n";        
+            break;
+        case AMOUNT_ILLEGAL:
+            logFile << "Error "<< params->atmNum <<": Your transaction failed – account id " << params->accountNum << " balance is lower than "<<params->amount <<"\n";
+            break;
+        case ACCOUNT_ALRDY_EXIST:
+            logFile << "Error "<< params->atmNum <<": Your transaction failed – account with the same id exists\n";
+            break;
+        default: break;
+    }
+    logFile.close();
+}
 
 //*******************************************************************************************************//
 
-	atm::atm (pBank associated_bank ,int id_num)
-	{
-		associated_bank_ = associated_bank;
-		id_num_ = id_num;
-		pthread_mutex_init(&atm_mutex_ , NULL) ;
-	}
-	
+atm::atm (pBank associated_bank ,int id_num)
+{
+	associated_bank_ = associated_bank;
+	id_num_ = id_num;
+	pthread_mutex_init(&atm_mutex_ , NULL) ;
+}
+
 //*******************************************************************************************************//	
 		
 	//atm::atm (const atm& atm) ;  //copy c'tor
@@ -65,180 +76,90 @@ const vector<string> breakStr (char* src, const char* delim){
 	
 //*******************************************************************************************************//
 	
-	void atm::atm_open_account (unsigned int account_num , string password , int balance)
-	{
-		sem_wait(&associated_bank_->bank_write);
-		pthread_mutex_lock(&atm_mutex_);
-
-		account new_account = account(account_num, password, balance);
-
-		//this->associated_bank_->bank_accounts_[account_num] = new_account;
-        int rc = associated_bank_->openAccount(account_num, new_account);
-		
-        if (rc)
-        {
-        	printf("%d: New account is %d with password %s and initial balance %d\n",id_num_,account_num,password.c_str(),balance);
-        }
-        else
-        {
-        	printf("Error %d: Your transaction failed – account with the same is exists\n",account_num);
-        }
-
-		pthread_mutex_unlock(&atm_mutex_);
-		sem_post(&associated_bank_->bank_write);
-
-	}
+void atm::atm_open_account (actionParams_t* params)
+{
+    sem_wait(&associated_bank_->bank_write);
+    pthread_mutex_lock(&atm_mutex_);
+    int retVal = associated_bank_->openAccount(params);
+    if (GOOD_OP == retVal) printLog(OPEN_MSG, params);
+    else printError(retVal,params);
+    pthread_mutex_unlock(&atm_mutex_);
+    sem_post(&associated_bank_->bank_write);
+}
 
 //*******************************************************************************************************//
 	
-	void atm::atm_deposit (unsigned int account_num , string password , unsigned int amount)
-	{	
-		sem_wait(&associated_bank_->bank_write);
-		pthread_mutex_lock(&atm_mutex_);
-
-
-		//it = associated_bank_->bank_accounts_.find(account_num) ; //get pointer for the account
-		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id
-		{
-			printf("Error %d: Your transaction failed – account id %d does not exist\n",id_num_,account_num);
-		}
-		else
-		{	
-			int new_balance =associated_bank_->bank_accounts_.find(account_num)->second.account_deposit(password,amount);
-			if(new_balance==PASS_ERROR)
-			{
-				printf("Error %d: Your transaction failed – password for account id %d is incorrect\n",id_num_,account_num);
-			}
-			else 
-			{
-				printf("%d: Account %d new balance is %d after %d $ was deposited\n",id_num_,account_num,new_balance,amount);
-			}
-		}
-		pthread_mutex_unlock(&atm_mutex_);
-		sem_post(&associated_bank_->bank_write);
-	}
+void atm::atm_deposit (actionParams_t* params)
+{	
+    sem_wait(&associated_bank_->bank_write);
+    pthread_mutex_lock(&atm_mutex_);
+    int retVal = associated_bank_->deposit_bank(params);
+    if (GOOD_OP == retVal) printLog(DEPOSIT_MSG,params);
+    else printError(retVal, params);
+    pthread_mutex_unlock(&atm_mutex_);
+    sem_post(&associated_bank_->bank_write);
+}
 
 //*******************************************************************************************************//
 	
-	void atm::atm_withdraw (unsigned int account_num , string password , unsigned int amount)
-	{
-		sem_wait(&associated_bank_->bank_write);
-		pthread_mutex_lock(&atm_mutex_);
-
-		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id
-		{
-			printf("Error %d: Your transaction failed – account id %d does not exist \n",id_num_,account_num);
-		}
-		else
-		{	
-			int new_balance = associated_bank_->bank_accounts_.find(account_num)->second.account_withdraw(password,amount);
-			if(new_balance==PASS_ERROR)
-			{
-				printf("Error %d: Your transaction failed – password for account id %d is incorrect\n",id_num_,account_num);
-			}
-			else if(new_balance == NEG_ERROR)
-			{
-				printf("Error %d: Your transaction failed – account id %d balance is lower than %d \n",id_num_,account_num,amount);
-			}
-			else
-			{
-				printf("%d: Account %d new balance is %d after %d $ was withdrew\n",id_num_,account_num,new_balance,amount);
-			}
-		}
-		pthread_mutex_unlock(&atm_mutex_);
-		sem_post(&associated_bank_->bank_write);
-
-	}
+void atm::atm_withdraw (actionParams_t* params)
+{
+    sem_wait(&associated_bank_->bank_write);
+    pthread_mutex_lock(&atm_mutex_);
+    int retVal = associated_bank_->withdraw_bank(params);
+    if (GOOD_OP == retVal) printLog(WITHDRAW_MSG,params);
+    else printError(retVal, params);
+    pthread_mutex_unlock(&atm_mutex_);
+    sem_post(&associated_bank_->bank_write);
+}
 
 //*******************************************************************************************************//
 	
-	void atm::atm_get_balance (unsigned int account_num , string password)
-	{	
+void atm::atm_get_balance (actionParams_t* params)
+{	
+    sem_wait(&associated_bank_->bank_read);
+    associated_bank_->reader_count ++ ;
+    if (associated_bank_->reader_count==1) sem_wait(&associated_bank_->bank_write);
+    sem_post(&associated_bank_->bank_read);
+    pthread_mutex_lock(&atm_mutex_);
+    int retVal = associated_bank_->get_balance_bank(params);
+    if (GOOD_OP == retVal) printLog(BALANCE_MSG,params);
+    else printError(retVal, params);
+    pthread_mutex_unlock(&atm_mutex_);
+    sem_wait(&associated_bank_->bank_read);
+    associated_bank_->reader_count -- ;
+    if(associated_bank_->reader_count ==0) sem_post(&associated_bank_->bank_write);
+    sem_post(&associated_bank_->bank_read);
 
-		sem_wait(&associated_bank_->bank_read);
-
-		 //todo: verify that atm can change private bank vat
-		associated_bank_->reader_count ++ ;
-		if (associated_bank_->reader_count==1){
-			sem_wait(&associated_bank_->bank_write); //todo : try sem_trywait here
-		}
-
-		sem_post(&associated_bank_->bank_read);
-
-		//cout << "**balance debug**--inside atm get balance before lock mutex--\n";
-		pthread_mutex_lock(&atm_mutex_);
-		//cout << "**balance debug**--inside atm get balance after lock mutex--\n";
-		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id
-		{
-			printf("Error %d: Your transaction failed – account id %d does not exist",id_num_,account_num);
-		}
-		else
-		{	
-			cout<<"account: "<<account_num<<" balance: is "<<associated_bank_->bank_accounts_.find(account_num)->second.account_get_balance(password)<<"\n";
-		//todo: get log massage and return it;
-		}
-		pthread_mutex_unlock(&atm_mutex_);
-	//	readers writer implimtation are in the print status method
-		sem_wait(&associated_bank_->bank_read);
-		associated_bank_->reader_count -- ;
-		if(associated_bank_->reader_count ==0){
-			sem_post(&associated_bank_->bank_write);
-		}
-		sem_post(&associated_bank_->bank_read);
-
-	}
+}
 //*******************************************************************************************************//
 	
-	//verifay password and call to the account d'tor 
-	void atm::atm_close_account (unsigned int account_num , string password)
-	{	
-		sem_wait(&associated_bank_->bank_write);
-		pthread_mutex_lock(&atm_mutex_);
-
-
-		if(associated_bank_->bank_accounts_.find(account_num) == associated_bank_->bank_accounts_.end()) // cant find account id
-		{
-			printf("Error %d: Your transaction failed – account id %d does not exist",id_num_,account_num);
-		}
-		else
-		{	
-			associated_bank_->bank_accounts_.find(account_num)->second.account_close(password);
-		//todo: get log massage and return it;
-		}
-		pthread_mutex_unlock(&atm_mutex_);
-		sem_post(&associated_bank_->bank_write);
-	}
+void atm::atm_close_account (actionParams_t* params)
+{	
+    sem_wait(&associated_bank_->bank_write);
+    pthread_mutex_lock(&atm_mutex_);
+    int retVal = associated_bank_->get_balance_bank(params);
+    if (GOOD_OP == retVal) printLog(CLOSE_MSG,params);
+    else printError(retVal, params);
+    pthread_mutex_unlock(&atm_mutex_);
+    sem_post(&associated_bank_->bank_write);
+}
 
 //*******************************************************************************************************//
-	
-	//thie method using account methods to transfer the money. 
-	void atm::atm_transfer_money (unsigned int source_account , string password ,unsigned int target_account, unsigned int amount)
-	{
-		sem_wait(&associated_bank_->bank_write);
-		pthread_mutex_lock(&atm_mutex_);
+void atm::atm_transfer_money (actionParams_t* params)
+{
+    sem_wait(&associated_bank_->bank_write);
+    pthread_mutex_lock(&atm_mutex_);
+    int retVal = associated_bank_->transfer_money_bank(params);
+    if (GOOD_OP == retVal) printLog(TRANSFER_MSG,params);
+    else printError(retVal, params);
+    pthread_mutex_unlock(&atm_mutex_);
+    sem_post(&associated_bank_->bank_write);
+}
 
-		//associated_bank_->bank_accounts_.find(account_num)->second
+//*******************************************************************************************************//
 
-		map<unsigned int ,account>::iterator src_it;
-		map<unsigned int ,account>::iterator tgt_it;
-		src_it = associated_bank_->bank_accounts_.find(source_account) ; //get referance pointer to account--need allocation ?
-		tgt_it = associated_bank_->bank_accounts_.find(target_account) ;
-		
-		//src_it->second->account_withdraw(password,amount);
-		associated_bank_->bank_accounts_.find(source_account)->second.account_withdraw(password,amount);
-
-		//todo: 
-		//if(the return value of withdraw indicate success then do) 
-			//target_account_reff.account_get_money(amount);
-			
-		//todo: get log massage and return it;
-		
-		pthread_mutex_unlock(&atm_mutex_);
-		sem_post(&associated_bank_->bank_write);
-	}
-
-
-const vector<string> breakStr (const char* src, char delim){
+/*const vector<string> breakStr (char* src, const char delim){
     char tempLine[sizeof(*src)] = {0};
     strcpy(tempLine, src);
     char* token = std::strtok(tempLine, &delim);
@@ -250,66 +171,71 @@ const vector<string> breakStr (const char* src, char delim){
         token = std::strtok(NULL, &delim);
     }
     return brokenStr;
-}
+}*/
 
 void* atm_main_loop(void* atmParamsLocal){//int atmNum, pBank bankInst,char const* actionFile){
 
 		if(DEBUG)cout <<"debug in the start of main loop" << "\n";
         pAtmParams me = (pAtmParams)atmParamsLocal;
-
         int atmNum = me->atmNum;
-
         pBank bankInst = me->assBank;
         if(DEBUG)cout << "Size of file name string " << sizeof(char)*strlen(me->inputFile) <<"\n";
         char* actionFile = new char[strlen(me->inputFile)];
-
         if(DEBUG)cout <<"debug in main loop before strcpy" << "\n";
         strcpy(actionFile, me->inputFile);
         if(DEBUG)cout <<"debug in main loop after strcpy" << "\n";
         delete(me);
-
+        
+        std::ofstream logFile;
+        logFile.open("log.txt",std::ios::app|std::ios::out);
+        logFile << "ATM " << atmNum <<" is ready\n";
+        logFile.close();
+        
+        actionParams_t params;
+        params.atmNum = atmNum;
         atm atminst(bankInst, atmNum);
-        //vector<string> lineParam;
-
+        
         std::ifstream infile(actionFile);
         std::string line;
         if(DEBUG)cout << "*debug -inside atm main loop before the main while" << "\n" ;
         while(std::getline(infile,line)){
-        		if(DEBUG)cout << "**debug -inside atm main loop inside! the main while --line param is:"<<line << "\n" ;
+                istringstream isl(line);
+                vector<string> lineCmd{istream_iterator<string>{isl}, istream_iterator<string>{}}; 		
+                if(DEBUG)cout << "**debug -inside atm main loop inside! the main while --line param is:"<<line << "\n" ;       
+                params.accountNum = atoi(lineCmd[1].c_str());
+                params.password = lineCmd[2];
 
-        		std::stringstream lineParam(line);
-                //lineParam= breakStr(line.c_str(), ' ');
+                if(DEBUG)cout <<"**debug -atm main loop before the switch lineCmd value is"<<lineCmd[0]<<"\n";
 
-                string cmd;
-                lineParam >> cmd;
-                unsigned int account_num;
-                string password;
-                int amount;
-                lineParam >> account_num >> password >> amount ;
-                if(DEBUG)cout <<"**debug -atm main loop before the switch lineParam value is"<<cmd<<"\n";
-                if(cmd == "O"){
+                switch(*lineCmd[0].c_str()){
+                    case 'O': 
                 		if(DEBUG)cout <<"***debug -atm main loop switch O"<<"\n";
-                        atminst.atm_open_account(account_num ,  password , amount);
+                        params.balance = atoi(lineCmd[3].c_str()); 
+                        atminst.atm_open_account(&params);
+                        break;
+                    case 'D':
+                        params.amount = atoi(lineCmd[3].c_str()); 
+                        atminst.atm_deposit (&params);
+                        break;
+                    case 'W':
+                        params.amount = atoi(lineCmd[3].c_str()); 
+                        atminst.atm_withdraw (&params);
+                        break;
+                    case 'B':
+                        atminst.atm_get_balance (&params);
+                        break;
+                    case 'Q':
+                        atminst.atm_close_account(&params);
+                        break;
+                    case 'T':
+                        params.tranAmount    = atoi(lineCmd[3].c_str());     
+                        params.targetAccount = atoi(lineCmd[3].c_str()); 
+                        atminst.atm_transfer_money (&params);
+                        break;
+                    default:
+                        printf("Bad action on atm %d",atmNum);
+                        break;
                 }
-                else if(cmd == "D"){
-                        atminst.atm_deposit (account_num, password, amount);
-                }
-                else if(cmd == "W"){
-                        atminst.atm_withdraw (account_num, password, amount);
-                }
-                else if(cmd == "B"){
-                        atminst.atm_get_balance (account_num, password);
-                }
-                else if(cmd == "Q"){
-                        atminst.atm_close_account(account_num, password);
-                }
-                else if(cmd == "T"){
-                    	unsigned int dst;
-                    	lineParam >> dst;
-                        atminst.atm_transfer_money (account_num, password, amount, dst);
-                }
-
-
                 usleep(100000);
         }
         delete(actionFile);

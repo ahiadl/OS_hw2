@@ -3,10 +3,6 @@
 #ifndef account_H_
 #define account_H_
 
-//#include "atm.h"
-//#include "bank.h"
-
-#include "includes.h"
 
 class account
 {
@@ -15,11 +11,11 @@ class account
         account (unsigned int account_num , string password , int balance);
 		account (const account &obj);
 		virtual ~account();
-		int account_deposit (string password ,int amount);
-		int account_withdraw (string password ,int amount);
-		int account_get_balance (string password);
-		int account_close (string password);
-		int account_get_money (int amount); 
+		int account_deposit (actionParams_t* params);
+		int account_withdraw (actionParams_t* params);
+		int account_get_balance (actionParams_t* params);
+		int account_close (actionParams_t* params);
+		int account_get_money (actionParams_t* params); 
         account& operator=(const account& src);
 		friend class bank; //the private bank account access direct to the acouunts methids
 		

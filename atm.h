@@ -1,61 +1,43 @@
-//atm.h
-
 #ifndef atm_H_
 #define atm_H_
-#include "bank.h"
-//#include "account.h"
-#include "includes.h"
 
 #define MAX_LINE_SIZE 256
 #define DEBUG 0 
 
-/*enum {
-    WRONG_PASSWORD = -1,
-    ACCOUNT_NOT_EXIST = -2,
-    AMOUNT_ILLEGAL =-3,
-}*/
 void* atm_main_loop(void* atmParamsiLocal);
 
-/*typedef struct {
-    int atmNum;
-    char* inputFile;
-    pBank assBank;
-}atmParams, pAtmParams;*/
-
-
-
 class atmParams{
-public:
-    int atmNum;
-    const char* inputFile;
-    pBank assBank;
+    public:
+        int atmNum;
+        const char* inputFile;
+        pBank assBank;
 };
 
 typedef atmParams* pAtmParams;
-typedef bank* pBank;
 typedef std::vector<std::string> Tokens;
+
+enum{
+    OPEN_MSG     = 0,
+    DEPOSIT_MSG  = 1,
+    WITHDRAW_MSG = 2,
+    BALANCE_MSG  = 3,
+    CLOSE_MSG    = 4,
+    TRANSFER_MSG = 5,
+};
+
+
+
 class atm
 {
 	public:
 		atm (pBank associated_bank ,int id_num) ;// c'tor
 		
-		//atm (const atm& atm) ;  //copy c'tor
-		
-		//~atm () ; //d'tor
-		
-		void atm_open_account (unsigned int account_num , string password , int balance);
-		
-		void atm_deposit (unsigned int account_num , string password , unsigned int amount); 
-		
-		void atm_withdraw (unsigned int account_num , string password , unsigned int amount); 
-		
-		void atm_get_balance (unsigned int account_num , string password); 
-		
-		//verifay password and call to the account d'tor 
-		void atm_close_account (unsigned int account_num , string password); 
-		
-		//thie method using account methods to transfer the money. 
-		void atm_transfer_money (unsigned int source_account , string password ,unsigned int target_account, unsigned int amount); 
+		void atm_open_account (actionParams_t* params);
+		void atm_deposit (actionParams_t* params); 
+		void atm_withdraw (actionParams_t* params); 
+		void atm_get_balance (actionParams_t* params);
+		void atm_close_account (actionParams_t* params); 
+		void atm_transfer_money (actionParams_t* params); 
 		
 		friend class bank ;
 	private:

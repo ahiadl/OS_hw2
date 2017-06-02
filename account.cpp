@@ -1,7 +1,5 @@
- // account.c
-
+#include "includes.h"
 #include "account.h"
-
 
 
 	account::account (unsigned int account_num , string password ,int balance)
@@ -14,7 +12,6 @@
     //	sem_read = sem_open("sem_read",O_CREAT);
 		sem_init(&sem_write,1,1) ;
 		sem_init(&sem_read,1,1) ;
-
 		readers_count_ = 0 ;
 		
 	}
@@ -52,66 +49,63 @@ account& account::operator=(const account& src){
    this->balance_ = src.balance_; 
    return *this;
 }
-
-	int account::account_deposit (string password , int amount)
+//**********************************************************************************************************//		
+	int account::account_deposit (actionParams_t* params)
 	{
-		if(password_ != password) //bad password
+		if(password_ != params->password) //bad password
 		{
-			  return PASS_ERROR;
+			  return WRONG_PASSWORD;
 		}		
 		else   // password match 
 		{
 			sem_wait(&sem_write);
 			usleep(1e6);
-			balance_ += amount ;
-			sem_post(&sem_write)	;
+			balance_ += params->amount ;
+            params->balance = balance_;
+			sem_post(&sem_write);
 		}
-		return balance_;
+		return GOOD_OP;
 	}
 				
 //**********************************************************************************************************//		
  
-	int account::account_withdraw (string password ,int amount)
+	int account::account_withdraw (actionParams_t* params)
 	{
-		if (password_ != password)  // bad password
+		if (password_ != params->password)  // bad password
 		{
-			  return PASS_ERROR;
+			  return WRONG_PASSWORD;
 		}
 		else   // password match
 		{
 			sem_wait(&sem_write);
 			usleep(1e6);
-			if ( amount > balance_) // illegal withdraw
-			{
-				//todo: handle illegal withdraw case;
+			if ( params->amount > balance_){ // illegal withdraw
+                params->balance = balance_;
 				sem_post(&sem_write);
-				return NEG_ERROR;
+				return AMOUNT_ILLEGAL;
 			}
 			else
 			{	
-				balance_ -= amount ;
-				//todo: handle log ; 
+				balance_ -= params->amount;
+                params->balance = balance_;
 				sem_post(&sem_write);
-				
 			}
 		}
-	return balance_ ;
+	return GOOD_OP;
 	}
 	
 //**********************************************************************************************************//		
  
-	int account::account_get_balance (string password)
+	int account::account_get_balance (actionParams_t* params)
 	{	
 		//string log ; 
-		if(password_ != password) //todo : bad password, handle this case  
+		if(password_ != params->password) //todo : bad password, handle this case  
 		{
-			 return PASS_ERROR;
+			 return WRONG_PASSWORD;
 		}
 		else   // password match
-		{
-			//cout << "**balance debug**--inside account get balance before sem read wait--start--\n";
+		{	
 			sem_wait(&sem_read) ;
-			//cout << "**balance debug**--inside account get balance after sem read wait--start--\n";
 			readers_count_ ++ ;
 			if(readers_count_ == 1)
 				//cout << "**balance debug**--inside account get balance before sem write wait--start--\n";
@@ -120,35 +114,27 @@ account& account::operator=(const account& src){
 
 			//cout << "**balance debug**--inside account get balance before sem read post--start--\n";
 			sem_post(&sem_read);
-			//cout << "**balance debug**--inside account get balance after sem read post--start--\n";
 			
-			int cur_balance = balance_ ;
+			params->balance = balance_;
 			usleep(1e6);
 			
 			sem_wait(&sem_read) ;
-			//cout << "**balance debug**--inside account get balance after sem read wait --finish--\n";
 			readers_count_ -- ;
-			if(readers_count_ == 0){
-				//cout << "**balance debug**--inside account get balance before sem write post --finish--\n";
+			if(readers_count_ == 0)
 				sem_post(&sem_write);   // we dont allow any reader if we need to write.
-				//cout << "**balance debug**--inside account get balance after sem write post --finish--\n";
-			}
-			//cout << "**balance debug**--inside account get balance before sem read post --finish--\n";
 			sem_post(&sem_read);
-			//cout << "**balance debug**--inside account get balance after sem read post --finish--\n";
-			return cur_balance;
+			return GOOD_OP;
 			
 		}
 	
 	}	
 //**********************************************************************************************************//		
 
-	 int account::account_close (string password)
+	 int account::account_close (actionParams_t* params)
 	 {
-	
-		if(password_ != password) //bad password
+		if(password_ != params->password) //bad password
 		{
-			  return PASS_ERROR;
+			  return WRONG_PASSWORD;
 		}		
 		else   // password match 
 		{   //todo: remove from accounts map
@@ -157,20 +143,21 @@ account& account::operator=(const account& src){
 			sem_destroy(&sem_write);
 			sem_destroy(&sem_read);
 		}
-		return SUCCESS;
+		return GOOD_OP;
 	 }
  
  //**********************************************************************************************************//	
  
-	int account::account_get_money (int amount)
+	int account::account_get_money (actionParams_t* params)
 	{	
 	//this method are used for atm transfer money -- the target account don't need password
-
+		
 		sem_wait(&sem_write);
 		usleep(1e6);
-		balance_ += amount ;
+		balance_ += params->tranAmount ;
+        params->dstBalance = balance_;
 		sem_post(&sem_write)	;
-		return balance_;
+		return GOOD_OP;
 	}
  
  

@@ -2,25 +2,29 @@
 
 #ifndef bank_H_
 #define bank_H_
+#ifndef ACCOUNT_H_
 #include "account.h"
-//#include "atm.h"
+#endif
 
-#include "includes.h"
-
-//forward declaration
-
-//class atm ;
 
 void* bank_main_loop(void* bankPtr);
 void* bank_print_loop(void* bankPtr);
+
+
+
 class bank
 {
 	public:
 		bank (unsigned int account_num , string password , int balance);
 		void* take_commission();
         void* print_status();
-        int openAccount(unsigned int account_num, account new_account);
-		
+        
+        int openAccount(actionParams_t* params);
+        int deposit_bank (actionParams_t* params);
+        int withdraw_bank (actionParams_t* params);
+        int get_balance_bank(actionParams_t* params);
+        int close_account_bank(actionParams_t* params);
+	    int transfer_money_bank(actionParams_t* params);	
 		friend class atm ; //i need the atm to access the acoounts of the bank
 	private:
 		string bank_pass ;

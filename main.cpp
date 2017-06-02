@@ -1,5 +1,8 @@
 #include "includes.h"
+#include "bank.h"
 #include "atm.h"
+
+using namespace std;
 
 #define BANK_THREADS 2
 #define DEBUG_MAIN 0
@@ -21,6 +24,14 @@ int main (int argc, const char* argv[])
     //todo: init this values; !!!
     int numOfAtm = atoi(argv[1]);
     int currentAtm=0;
+    
+
+    remove("log.txt");
+    ofstream logFile;
+    logFile.open("log.txt");
+    logFile << "Welcome to Ahiads' & Roeis' Bank\n";
+    logFile << "The Best Bank in all The Middle East\n";
+    logFile.close();
 
     unsigned int bank_account_num = BANLK_ACCOUNT_NUM ;
 
@@ -36,7 +47,7 @@ int main (int argc, const char* argv[])
     for (currentAtm = 0; currentAtm < numOfAtm; currentAtm++){
         if(DEBUG_MAIN) cout << "Started thread Iteratin: "<<currentAtm<< "\n";
         curAtmPar = new(std::nothrow) atmParams;
-        curAtmPar->atmNum = currentAtm;
+        curAtmPar->atmNum = currentAtm+1;
         curAtmPar->assBank = &bank;
         curAtmPar->inputFile = argv[currentAtm+2];
         if(DEBUG_MAIN) printf("**debug argument passing to thread argv[curr] is: %s \n", argv[currentAtm+2]);
@@ -61,7 +72,7 @@ int main (int argc, const char* argv[])
     int atmWait;     
     for (atmWait = 0; atmWait < numOfAtm+2; atmWait++)
       pthread_join(atmsThreads[atmWait],NULL);
-    pthread_join(bankThreads[0],NULL); 
+    pthread_cancel(bankThreads[0]); 
     pthread_cancel(bankThreads[1]);
     return 0; 
 }
