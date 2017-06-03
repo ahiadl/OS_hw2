@@ -72,7 +72,7 @@ int main (int argc, const char* argv[])
     int atmWait;     
     for (atmWait = 0; atmWait < numOfAtm; atmWait++){
         pthread_join(atmsThreads[atmWait],NULL);
-        cout << "Joined all threads\n";
+        if(DEBUG) cout << "Joined all threads\n";
     }
     pthread_cancel(bankThreads[0]); 
     pthread_cancel(bankThreads[1]);

@@ -7,22 +7,22 @@ void printLog(int msg_code, actionParams_t* params){
     logFile.open("log.txt",std::ios::app|std::ios::out);
     switch(msg_code){
         case OPEN_MSG:
-            /*logFile*/cout << params->atmNum <<": New aacount id is "<< params->accountNum <<" with password "<< params->password << " and initial balance "<<params->balance <<"\n";
+            logFile/*cout*/ << params->atmNum <<": New aacount id is "<< params->accountNum <<" with password "<< params->password << " and initial balance "<<params->balance <<"\n";
             break;
         case DEPOSIT_MSG:
-            /*logFile*/cout << params->atmNum <<": Account "<< params->accountNum <<" new balance is "<< params->balance << " after "<<params->amount << " $ was deposited\n";
+            logFile/*cout*/ << params->atmNum <<": Account "<< params->accountNum <<" new balance is "<< params->balance << " after "<<params->amount << " $ was deposited\n";
             break;
         case WITHDRAW_MSG:
-            /*logFile*/ cout << params->atmNum <<": Account "<< params->accountNum <<" new balance is "<< params->balance << " after "<<params->amount << " $ was withdrew\n";
+            logFile/* cout*/ << params->atmNum <<": Account "<< params->accountNum <<" new balance is "<< params->balance << " after "<<params->amount << " $ was withdrew\n";
             break;
         case BALANCE_MSG:  
-            /*logFile*/cout << params->atmNum <<": Account "<< params->accountNum <<" balance is "<< params->balance << "\n";
+            logFile/*cout*/ << params->atmNum <<": Account "<< params->accountNum <<" balance is "<< params->balance << "\n";
             break;
         case CLOSE_MSG:  
-            cout/*logFile*/ << params->atmNum <<": Account "<< params->accountNum <<"is now closed. Balance was " << params->balance <<"\n";
+            logFile/*cout*/ << params->atmNum <<": Account "<< params->accountNum <<"is now closed. Balance was " << params->balance <<"\n";
             break;
         case TRANSFER_MSG: 
-            /*logFile*/cout << params->atmNum <<": Transfer "<< params->tranAmount <<"from account "<< params->accountNum <<" to account "<< params->targetAccount <<". new account balance is " <<params->balance <<" new target account balance "<< params->dstBalance << "\n";
+            logFile/*cout*/ << params->atmNum <<": Transfer "<< params->tranAmount <<"from account "<< params->accountNum <<" to account "<< params->targetAccount <<". new account balance is " <<params->balance <<" new target account balance "<< params->dstBalance << "\n";
             break;
         default: break;
     }
@@ -35,16 +35,16 @@ void printError(int error_code, actionParams_t* params){
     logFile.open("log.txt",std::ios::app|std::ios::out);
     switch(error_code){
         case WRONG_PASSWORD:
-            logFile <<"Error " << params->atmNum <<": Your transaction failed – password for account "<< params->accountNum << " is incorrect\n";
+            logFile/*cout*/<<"Error " << params->atmNum <<": Your transaction failed – password for account "<< params->accountNum << " is incorrect\n";
             break;
         case ACCOUNT_NOT_EXIST:
-            logFile << "Error "<< params->atmNum <<": Your transaction failed – account id "<< params->accountNum << " does not exists\n";        
+            logFile/*cout*/<< "Error "<< params->atmNum <<": Your transaction failed – account id "<< params->accountNum << " does not exists\n";        
             break;
         case AMOUNT_ILLEGAL:
-            logFile << "Error "<< params->atmNum <<": Your transaction failed – account id " << params->accountNum << " balance is lower than "<<params->amount <<"\n";
+            logFile/*cout*/ << "Error "<< params->atmNum <<": Your transaction failed – account id " << params->accountNum << " balance is lower than "<<params->amount <<"\n";
             break;
         case ACCOUNT_ALRDY_EXIST:
-            logFile << "Error "<< params->atmNum <<": Your transaction failed – account with the same id exists\n";
+            logFile/*cout*/ << "Error "<< params->atmNum <<": Your transaction failed – account with the same id exists\n";
             break;
         default: break;
     }
@@ -75,10 +75,20 @@ atm::atm (pBank associated_bank ,int id_num)
 	}*/
 	
 //*******************************************************************************************************//
-	
+void printSemStatus (pBank curBank, string phase){
+    	if(!DEBUG) return;
+        int semVal;
+        int readSemVal;
+        sem_getvalue(&curBank->bank_write, &semVal);
+        sem_getvalue(&curBank->bank_read, &readSemVal);
+        cout << phase <<" write sem : " << semVal << "read sem val: "<< readSemVal <<"read count: " << curBank->reader_count<< "\n";
+}
+
 void atm::atm_open_account (actionParams_t* params)
 {    if(DEBUG) cout << "locking open sem\n";
+    printSemStatus(associated_bank_, "open account before lock");
     sem_wait(&associated_bank_->bank_write);
+    printSemStatus(associated_bank_, "open account after lock");
      if(DEBUG) cout << "locked open sem\n";
     pthread_mutex_lock(&atm_mutex_);
     int retVal = associated_bank_->openAccount(params);
@@ -86,7 +96,9 @@ void atm::atm_open_account (actionParams_t* params)
     else printError(retVal,params);
     pthread_mutex_unlock(&atm_mutex_);
      if(DEBUG) cout << "releasing open sem\n";
-    sem_post(&associated_bank_->bank_write);
+     printSemStatus(associated_bank_, "open account before release"); 
+     sem_post(&associated_bank_->bank_write);
+     printSemStatus(associated_bank_, "open account after after release");
      if(DEBUG) cout << "released open sem\n";
 }
 
@@ -94,14 +106,17 @@ void atm::atm_open_account (actionParams_t* params)
 	
 void atm::atm_deposit (actionParams_t* params)
 {	
-
+     	printSemStatus(associated_bank_, "deposit before 1st wait for read");
 	sem_wait(&associated_bank_->bank_read);
 	associated_bank_-> reader_count ++;
+    	printSemStatus(associated_bank_, "deposit after 1st reader advance");
 	if (associated_bank_->reader_count == 1) {
 		sem_wait(&associated_bank_->bank_write);
+     		printSemStatus(associated_bank_, "deposit after write lock");
 	}
+	printSemStatus(associated_bank_, "deposit before 1st post");		
 	sem_post(&associated_bank_->bank_read);
-	
+	printSemStatus(associated_bank_, "deposit after 1st post");
 
     pthread_mutex_lock(&atm_mutex_);
     int retVal = associated_bank_->deposit_bank(params);
@@ -109,13 +124,17 @@ void atm::atm_deposit (actionParams_t* params)
     else printError(retVal, params);
     pthread_mutex_unlock(&atm_mutex_);
    
-
+	printSemStatus(associated_bank_, "deposit before 2nd wait for read");
 	sem_wait(&associated_bank_->bank_read);
 	associated_bank_->reader_count--;
+	printSemStatus(associated_bank_, "deposit after 2nd reader advance");
 	if (associated_bank_->reader_count == 0) {
 		sem_post(&associated_bank_->bank_write);
+		printSemStatus(associated_bank_, "deposit after write release");
 	}
+	printSemStatus(associated_bank_, "deposit before 2nd post");	
 	sem_post(&associated_bank_->bank_read);
+	printSemStatus(associated_bank_, "deposit after 2nd post");
 }
 
 //*******************************************************************************************************//
@@ -123,26 +142,37 @@ void atm::atm_deposit (actionParams_t* params)
 void atm::atm_withdraw (actionParams_t* params)
 {
     
+	     	printSemStatus(associated_bank_, "withdraw before 1st wait for read");
 	sem_wait(&associated_bank_->bank_read);
-	associated_bank_->reader_count++;
+	associated_bank_-> reader_count ++;
+    	printSemStatus(associated_bank_, "withdraw after 1st reader advance");
 	if (associated_bank_->reader_count == 1) {
 		sem_wait(&associated_bank_->bank_write);
+     		printSemStatus(associated_bank_, "withdraw after write lock");
 	}
+	printSemStatus(associated_bank_, "withdraw before 1st post");		
 	sem_post(&associated_bank_->bank_read);
+	printSemStatus(associated_bank_, "withdraw after 1st post");
+
 
     pthread_mutex_lock(&atm_mutex_);
     int retVal = associated_bank_->withdraw_bank(params);
     if (GOOD_OP == retVal) printLog(WITHDRAW_MSG,params);
     else printError(retVal, params);
     pthread_mutex_unlock(&atm_mutex_);
-    sem_post(&associated_bank_->bank_write);
+    //sem_post(&associated_bank_->bank_write);
 
+	printSemStatus(associated_bank_, "withdraw before 2nd wait for read");
 	sem_wait(&associated_bank_->bank_read);
 	associated_bank_->reader_count--;
+	printSemStatus(associated_bank_, "withdraw after 2nd reader advance");
 	if (associated_bank_->reader_count == 0) {
 		sem_post(&associated_bank_->bank_write);
+		printSemStatus(associated_bank_, "withdraw after write release");
 	}
+	printSemStatus(associated_bank_, "withdraw before 2nd post");	
 	sem_post(&associated_bank_->bank_read);
+	printSemStatus(associated_bank_, "withdraw after 2nd post");
 
 }
 
@@ -150,12 +180,18 @@ void atm::atm_withdraw (actionParams_t* params)
 	
 void atm::atm_get_balance (actionParams_t* params)
 {	
+	     	printSemStatus(associated_bank_, "get_balance before 1st wait for read");
 	sem_wait(&associated_bank_->bank_read);
-	associated_bank_->reader_count++;
+	associated_bank_-> reader_count ++;
+    	printSemStatus(associated_bank_, "get_balance after 1st reader advance");
 	if (associated_bank_->reader_count == 1) {
 		sem_wait(&associated_bank_->bank_write);
+     		printSemStatus(associated_bank_, "get_balance after write lock");
 	}
+	printSemStatus(associated_bank_, "get_balance before 1st post");		
 	sem_post(&associated_bank_->bank_read);
+	printSemStatus(associated_bank_, "get_balance after 1st post");
+
 
     pthread_mutex_lock(&atm_mutex_);
     int retVal = associated_bank_->get_balance_bank(params);
@@ -163,36 +199,50 @@ void atm::atm_get_balance (actionParams_t* params)
     else printError(retVal, params);
     pthread_mutex_unlock(&atm_mutex_);
 
+	printSemStatus(associated_bank_, "get_balance before 2nd wait for read");
 	sem_wait(&associated_bank_->bank_read);
 	associated_bank_->reader_count--;
+	printSemStatus(associated_bank_, "get_balance after 2nd reader advance");
 	if (associated_bank_->reader_count == 0) {
 		sem_post(&associated_bank_->bank_write);
+		printSemStatus(associated_bank_, "get_balance after write release");
 	}
+	printSemStatus(associated_bank_, "get_balance before 2nd post");	
 	sem_post(&associated_bank_->bank_read);
+	printSemStatus(associated_bank_, "get_balance after 2nd post");
 
 }
 //*******************************************************************************************************//
 	
 void atm::atm_close_account (actionParams_t* params)
-{	
+{
+    printSemStatus(associated_bank_, "close_account before lock");	
     sem_wait(&associated_bank_->bank_write);
+    printSemStatus(associated_bank_, "close_account after lock");
     pthread_mutex_lock(&atm_mutex_);
     int retVal = associated_bank_->get_balance_bank(params);
     if (GOOD_OP == retVal) printLog(CLOSE_MSG,params);
     else printError(retVal, params);
     pthread_mutex_unlock(&atm_mutex_);
+    printSemStatus(associated_bank_, "close_account before release");
     sem_post(&associated_bank_->bank_write);
+    printSemStatus(associated_bank_, "close_account after after release");
 }
 
 //*******************************************************************************************************//
 void atm::atm_transfer_money (actionParams_t* params)
 {
+	     	printSemStatus(associated_bank_, "transfer before 1st wait for read");
 	sem_wait(&associated_bank_->bank_read);
-	associated_bank_->reader_count++;
+	associated_bank_-> reader_count ++;
+    	printSemStatus(associated_bank_, "transfer after 1st reader advance");
 	if (associated_bank_->reader_count == 1) {
 		sem_wait(&associated_bank_->bank_write);
+     		printSemStatus(associated_bank_, "transfer after write lock");
 	}
+	printSemStatus(associated_bank_, "transfer before 1st post");		
 	sem_post(&associated_bank_->bank_read);
+	printSemStatus(associated_bank_, "transfer after 1st post");
 
     pthread_mutex_lock(&atm_mutex_);
     int retVal = associated_bank_->transfer_money_bank(params);
@@ -201,29 +251,20 @@ void atm::atm_transfer_money (actionParams_t* params)
     pthread_mutex_unlock(&atm_mutex_);
     sem_post(&associated_bank_->bank_write);
 
+	printSemStatus(associated_bank_, "transfer before 2nd wait for read");
 	sem_wait(&associated_bank_->bank_read);
 	associated_bank_->reader_count--;
+	printSemStatus(associated_bank_, "transfer after 2nd reader advance");
 	if (associated_bank_->reader_count == 0) {
 		sem_post(&associated_bank_->bank_write);
+		printSemStatus(associated_bank_, "transfer after write release");
 	}
+	printSemStatus(associated_bank_, "transfer before 2nd post");	
 	sem_post(&associated_bank_->bank_read);
+	printSemStatus(associated_bank_, "transfer after 2nd post");
 }
 
 //*******************************************************************************************************//
-
-/*const vector<string> breakStr (char* src, const char delim){
-    char tempLine[sizeof(*src)] = {0};
-    strcpy(tempLine, src);
-    char* token = std::strtok(tempLine, &delim);
-    vector<string> brokenStr;
-    int i = 0;
-    while(token != NULL){
-        brokenStr.push_back(token);
-        i++;
-        token = std::strtok(NULL, &delim);
-    }
-    return brokenStr;
-}*/
 
 void* atm_main_loop(void* atmParamsLocal){//int atmNum, pBank bankInst,char const* actionFile){
 

@@ -28,6 +28,7 @@ class bank
 		friend class atm ; //i need the atm to access the acoounts of the bank
         friend void* bank_main_loop (void* bankPtr);
         friend void* bank_print_loop(void* bankPtr);
+        friend void printSemStatus(bank* curBank, string phase); 
 	private:
 		string bank_pass ;
 		unsigned int bank_account_num ;
