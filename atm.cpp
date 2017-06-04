@@ -2,6 +2,12 @@
 #include "bank.h"
 #include "atm.h"
 
+//******************************************************************
+//print log - prints the relecant log line into the log file.
+//it gets the operation code and relevant params and print the suitable
+//log message. for debug we added a mechanism that allows us to print the messages to
+//the screen instead of into a file.
+//*****************************************************************
 void printLog(int msg_code, actionParams_t* params){
     std::ofstream logFile;
     logFile.open("log.txt",std::ios::app|std::ios::out);
@@ -35,7 +41,10 @@ void printLog(int msg_code, actionParams_t* params){
     logFile.close();
 }
 
-
+//******************************************************************
+//print error- gets a error code and params and print the
+//relevant error msg to the file\screec(for debug)
+//*****************************************************************
 void printError(int error_code, actionParams_t* params){
     std::ofstream logFile;
     logFile.open("log.txt",std::ios::app|std::ios::out);
@@ -62,7 +71,7 @@ void printError(int error_code, actionParams_t* params){
 }
 
 //*******************************************************************************************************//
-
+//constructor of atm
 atm::atm (pBank associated_bank ,int id_num)
 {
 	associated_bank_ = associated_bank;
@@ -70,21 +79,8 @@ atm::atm (pBank associated_bank ,int id_num)
 	pthread_mutex_init(&atm_mutex_ , NULL) ;
 }
 
-//*******************************************************************************************************//	
-		
-	//atm::atm (const atm& atm) ;  //copy c'tor
-	
-//*******************************************************************************************************//	
-	
-	/*atm::~atm ()  //d'tor
-	{
-		pthread_exit(&atm_id_) ;
-		pthread_mutex_destroy(&atm_mutex_) ;
-		delete[] associated_bank_ ;
-		
-	}*/
-	
 //*******************************************************************************************************//
+//debug function that prints the semaphore value
 void printSemStatus (pBank curBank, string phase){
     	if(!DEBUG) return;
         int semVal;
@@ -94,26 +90,31 @@ void printSemStatus (pBank curBank, string phase){
         cout << phase <<" write sem : " << semVal << "read sem val: "<< readSemVal <<"read count: " << curBank->reader_count<< "\n";
 }
 
+//*******************************************************************************************************//
+//open account method. lock the entire bank and calls bank open account method and prints suitable log
 void atm::atm_open_account (actionParams_t* params)
-{    if(DEBUG) cout << "locking open sem\n";
+{    
+    if(DEBUG) cout << "locking open sem\n";
     printSemStatus(associated_bank_, "open account before lock");
     sem_wait(&associated_bank_->bank_write);
     printSemStatus(associated_bank_, "open account after lock");
-     if(DEBUG) cout << "locked open sem\n";
+    if(DEBUG) cout << "locked open sem\n";
     pthread_mutex_lock(&atm_mutex_);
+  
     int retVal = associated_bank_->openAccount(params);
     if (GOOD_OP == retVal) printLog(OPEN_MSG, params);
     else printError(retVal,params);
+    
     pthread_mutex_unlock(&atm_mutex_);
-     if(DEBUG) cout << "releasing open sem\n";
-     printSemStatus(associated_bank_, "open account before release"); 
-     sem_post(&associated_bank_->bank_write);
-     printSemStatus(associated_bank_, "open account after after release");
-     if(DEBUG) cout << "released open sem\n";
+    if(DEBUG) cout << "releasing open sem\n";
+    printSemStatus(associated_bank_, "open account before release"); 
+    sem_post(&associated_bank_->bank_write);
+    printSemStatus(associated_bank_, "open account after after release");
+    if(DEBUG) cout << "released open sem\n";
 }
 
-//*******************************************************************************************************//
-	
+//*******************************************************************************************************/
+//atm deposit method. mark itself as reader, and calls bank deposit method and prints suitable log
 void atm::atm_deposit (actionParams_t* params)
 {	
      	printSemStatus(associated_bank_, "deposit before 1st wait for read");
@@ -127,13 +128,13 @@ void atm::atm_deposit (actionParams_t* params)
 	printSemStatus(associated_bank_, "deposit before 1st post");		
 	sem_post(&associated_bank_->bank_read);
 	printSemStatus(associated_bank_, "deposit after 1st post");
-
     pthread_mutex_lock(&atm_mutex_);
+
     int retVal = associated_bank_->deposit_bank(params);
     if (GOOD_OP == retVal) printLog(DEPOSIT_MSG,params);
     else printError(retVal, params);
+    
     pthread_mutex_unlock(&atm_mutex_);
-   
 	printSemStatus(associated_bank_, "deposit before 2nd wait for read");
 	sem_wait(&associated_bank_->bank_read);
 	associated_bank_->reader_count--;
@@ -147,12 +148,11 @@ void atm::atm_deposit (actionParams_t* params)
 	printSemStatus(associated_bank_, "deposit after 2nd post");
 }
 
-//*******************************************************************************************************//
-	
+//*******************************************************************************************************/
+//atm withdraw method. mark itself as reader, and calls bank withdraw method and prints suitable log
 void atm::atm_withdraw (actionParams_t* params)
 {
-    
-	     	printSemStatus(associated_bank_, "withdraw before 1st wait for read");
+	printSemStatus(associated_bank_, "withdraw before 1st wait for read");
 	sem_wait(&associated_bank_->bank_read);
 	associated_bank_-> reader_count ++;
     	printSemStatus(associated_bank_, "withdraw after 1st reader advance");
@@ -163,15 +163,13 @@ void atm::atm_withdraw (actionParams_t* params)
 	printSemStatus(associated_bank_, "withdraw before 1st post");		
 	sem_post(&associated_bank_->bank_read);
 	printSemStatus(associated_bank_, "withdraw after 1st post");
-
-
     pthread_mutex_lock(&atm_mutex_);
+
     int retVal = associated_bank_->withdraw_bank(params);
     if (GOOD_OP == retVal) printLog(WITHDRAW_MSG,params);
     else printError(retVal, params);
-    pthread_mutex_unlock(&atm_mutex_);
-    //sem_post(&associated_bank_->bank_write);
 
+    pthread_mutex_unlock(&atm_mutex_);
 	printSemStatus(associated_bank_, "withdraw before 2nd wait for read");
 	sem_wait(&associated_bank_->bank_read);
 	associated_bank_->reader_count--;
@@ -187,7 +185,7 @@ void atm::atm_withdraw (actionParams_t* params)
 }
 
 //*******************************************************************************************************//
-	
+//atm get_balance method. mark itself as Bank reader, and calls bank get_balance method and prints suitable log
 void atm::atm_get_balance (actionParams_t* params)
 {	
 	     	printSemStatus(associated_bank_, "get_balance before 1st wait for read");
@@ -223,16 +221,18 @@ void atm::atm_get_balance (actionParams_t* params)
 
 }
 //*******************************************************************************************************//
-	
+//atm close method. mark itself as Bank writer, and calls bank close_account method and prints suitable log
 void atm::atm_close_account (actionParams_t* params)
 {
     printSemStatus(associated_bank_, "close_account before lock");	
     sem_wait(&associated_bank_->bank_write);
     printSemStatus(associated_bank_, "close_account after lock");
     pthread_mutex_lock(&atm_mutex_);
+
     int retVal = associated_bank_->get_balance_bank(params);
     if (GOOD_OP == retVal) printLog(CLOSE_MSG,params);
     else printError(retVal, params);
+
     pthread_mutex_unlock(&atm_mutex_);
     printSemStatus(associated_bank_, "close_account before release");
     sem_post(&associated_bank_->bank_write);
@@ -240,12 +240,13 @@ void atm::atm_close_account (actionParams_t* params)
 }
 
 //*******************************************************************************************************//
+//atm transfer method. mark itself as Bank reader, and calls bank transfer method and prints suitable log
 void atm::atm_transfer_money (actionParams_t* params)
 {
-	     	printSemStatus(associated_bank_, "transfer before 1st wait for read");
+   	printSemStatus(associated_bank_, "transfer before 1st wait for read");
 	sem_wait(&associated_bank_->bank_read);
 	associated_bank_-> reader_count ++;
-    	printSemStatus(associated_bank_, "transfer after 1st reader advance");
+   	printSemStatus(associated_bank_, "transfer after 1st reader advance");
 	if (associated_bank_->reader_count == 1) {
 		sem_wait(&associated_bank_->bank_write);
      		printSemStatus(associated_bank_, "transfer after write lock");
@@ -255,11 +256,13 @@ void atm::atm_transfer_money (actionParams_t* params)
 	printSemStatus(associated_bank_, "transfer after 1st post");
 
     pthread_mutex_lock(&atm_mutex_);
+    
     int retVal = associated_bank_->transfer_money_bank(params);
     if (GOOD_OP == retVal) printLog(TRANSFER_MSG,params);
     else printError(retVal, params);
+    
     pthread_mutex_unlock(&atm_mutex_);
-    sem_post(&associated_bank_->bank_write);
+    //sem_post(&associated_bank_->bank_write);
 
 	printSemStatus(associated_bank_, "transfer before 2nd wait for read");
 	sem_wait(&associated_bank_->bank_read);
@@ -275,9 +278,14 @@ void atm::atm_transfer_money (actionParams_t* params)
 }
 
 //*******************************************************************************************************//
-
+//************************************************************************
+//atm_main_loop - create the atm, parse the actions file, calls relevant atm method.
+//end when the file is over.
+//this is the code that the thread mainly runs
+//
+//************************************************************************
 void* atm_main_loop(void* atmParamsLocal){//int atmNum, pBank bankInst,char const* actionFile){
-
+        //parse all data from main
 		if(DEBUG)cout <<"debug in the start of main loop" << "\n";
         pAtmParams me = (pAtmParams)atmParamsLocal;
         int atmNum = me->atmNum;
@@ -288,16 +296,17 @@ void* atm_main_loop(void* atmParamsLocal){//int atmNum, pBank bankInst,char cons
         strcpy(actionFile, me->inputFile);
         if(DEBUG)cout <<"debug in main loop after strcpy" << "\n";
         delete(me);
-        
+        //accessing the file.
         std::ofstream logFile;
         logFile.open("log.txt",std::ios::app|std::ios::out);
-        logFile << "ATM " << atmNum <<" is ready\n";
+        if(DEBUG)logFile << "ATM " << atmNum <<" is ready\n";
         logFile.close();
-        
+        //create params struct for actions the params struct is a package of data regarding the cut account we handle. it also contains
+        //the atm num it was sent from, only for print log needs.
         actionParams_t params;
         params.atmNum = atmNum;
         atm atminst(bankInst, atmNum);
-        
+        //scanning the file line by line, extracting relevant data from relevant fields 
         std::ifstream infile(actionFile);
         std::string line;
         if(DEBUG)cout << "*debug -inside atm main loop before the main while" << "\n" ;
