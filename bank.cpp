@@ -9,7 +9,11 @@
 
 
 //**************************************************************************************//
-//charge commison 
+//bank main loop - this function iterativly calls the bank method which charge commission
+//the call is timered with 3 second time.
+//we lock the entire bank so commission will be charged in a cross account manner with same
+//chronological order of the operations order
+//**************************************************************************************// 
 
 void* bank_main_loop (void* bankPtr){
     pBank ourBank = (pBank)bankPtr;
@@ -36,7 +40,11 @@ void* bank_main_loop (void* bankPtr){
     }
     return NULL;
 }
-
+//******************************************************************************************//
+//bank print loop - this function iterativly calls the bank print method. it is driven by 
+//timer of 0.5 sec time. this function locks the entire bank since no changes should be happening in
+//the bank or else the print will be in accurate.
+//*****************************************************************************************//
 void* bank_print_loop(void* bankPtr){
     pBank ourBank = (pBank)bankPtr;
     int semVal;
@@ -67,7 +75,7 @@ void* bank_print_loop(void* bankPtr){
 }
 
 //**************************************************************************************//
-
+//constructor. here we init the semaphores
 	bank::bank(unsigned int account_num , string password , int balance)
 	{   
     	bank_pass = password ;
@@ -80,7 +88,8 @@ void* bank_print_loop(void* bankPtr){
 		reader_count = 0 ;
 	}
 //**************************************************************************************//
-    
+//open account method, this method does not requires any direct method of the account object as it only creates a new account 
+//(requires account constructor and operator=    
 	int bank::openAccount(actionParams_t *params)
 	{
 		 if(DEBUG) cout<<"inside bank open account\n";
@@ -93,7 +102,9 @@ void* bank_print_loop(void* bankPtr){
         return ACCOUNT_ALRDY_EXIST;
 	}
 //**************************************************************************************//	
-    void bank::take_commission()
+//take commision method - scan the entire accounts map and charge a randomly chosen commision
+//when this method operate the charge main loop lock the entire bank in order to keep the chronologic integrity
+void bank::take_commission()
 	{
         actionParams_t params;       
         params.isDstBank=1;
@@ -116,7 +127,8 @@ void* bank_print_loop(void* bankPtr){
 	}
 	
 //**************************************************************************************//
-
+// bank print method - the bank print method, scans the accounts vector and print each one data.
+// when this method operates the print main loop lock the entire bank in order to keep the chronologic integrity 
 void bank::print_status()
 {
     actionParams_t params;
@@ -144,6 +156,8 @@ void bank::print_status()
 
 
 //**************************************************************************************//
+//generally: the bank merely checks the validity of the password and that the account existing in its list
+//(or not exist - depend on the operation)
 
 int bank::deposit_bank (actionParams_t* params){
     if(bank_accounts_.find(params->accountNum) == bank_accounts_.end()) // cant find account id
