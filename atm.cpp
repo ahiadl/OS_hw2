@@ -93,55 +93,42 @@ void printSemStatus (pBank curBank, string phase){
 //*******************************************************************************************************//
 //open account method. lock the entire bank and calls bank open account method and prints suitable log
 void atm::atm_open_account (actionParams_t* params)
-{    
-    if(DEBUG) cout << "locking open sem\n";
+{   
     printSemStatus(associated_bank_, "open account before lock");
     sem_wait(&associated_bank_->bank_write);
-    printSemStatus(associated_bank_, "open account after lock");
-    if(DEBUG) cout << "locked open sem\n";
     pthread_mutex_lock(&atm_mutex_);
-  
+    
     int retVal = associated_bank_->openAccount(params);
     if (GOOD_OP == retVal) printLog(OPEN_MSG, params);
     else printError(retVal,params);
     
     pthread_mutex_unlock(&atm_mutex_);
-    if(DEBUG) cout << "releasing open sem\n";
-    printSemStatus(associated_bank_, "open account before release"); 
     sem_post(&associated_bank_->bank_write);
     printSemStatus(associated_bank_, "open account after after release");
-    if(DEBUG) cout << "released open sem\n";
 }
 
 //*******************************************************************************************************/
 //atm deposit method. mark itself as reader, and calls bank deposit method and prints suitable log
 void atm::atm_deposit (actionParams_t* params)
-{	
-     	printSemStatus(associated_bank_, "deposit before 1st wait for read");
+{
+    printSemStatus(associated_bank_, "deposit before 1st wait for read");
 	sem_wait(&associated_bank_->bank_read);
 	associated_bank_-> reader_count ++;
-    	printSemStatus(associated_bank_, "deposit after 1st reader advance");
 	if (associated_bank_->reader_count == 1) {
 		sem_wait(&associated_bank_->bank_write);
-     		printSemStatus(associated_bank_, "deposit after write lock");
 	}
-	printSemStatus(associated_bank_, "deposit before 1st post");		
 	sem_post(&associated_bank_->bank_read);
-	printSemStatus(associated_bank_, "deposit after 1st post");
     pthread_mutex_lock(&atm_mutex_);
-
+    
     int retVal = associated_bank_->deposit_bank(params);
     if (GOOD_OP == retVal) printLog(DEPOSIT_MSG,params);
     else printError(retVal, params);
     
     pthread_mutex_unlock(&atm_mutex_);
-	printSemStatus(associated_bank_, "deposit before 2nd wait for read");
 	sem_wait(&associated_bank_->bank_read);
 	associated_bank_->reader_count--;
-	printSemStatus(associated_bank_, "deposit after 2nd reader advance");
 	if (associated_bank_->reader_count == 0) {
 		sem_post(&associated_bank_->bank_write);
-		printSemStatus(associated_bank_, "deposit after write release");
 	}
 	printSemStatus(associated_bank_, "deposit before 2nd post");	
 	sem_post(&associated_bank_->bank_read);
@@ -155,70 +142,55 @@ void atm::atm_withdraw (actionParams_t* params)
 	printSemStatus(associated_bank_, "withdraw before 1st wait for read");
 	sem_wait(&associated_bank_->bank_read);
 	associated_bank_-> reader_count ++;
-    	printSemStatus(associated_bank_, "withdraw after 1st reader advance");
+  	printSemStatus(associated_bank_, "withdraw after 1st reader advance");
 	if (associated_bank_->reader_count == 1) {
 		sem_wait(&associated_bank_->bank_write);
-     		printSemStatus(associated_bank_, "withdraw after write lock");
 	}
-	printSemStatus(associated_bank_, "withdraw before 1st post");		
 	sem_post(&associated_bank_->bank_read);
-	printSemStatus(associated_bank_, "withdraw after 1st post");
     pthread_mutex_lock(&atm_mutex_);
-
+    
     int retVal = associated_bank_->withdraw_bank(params);
     if (GOOD_OP == retVal) printLog(WITHDRAW_MSG,params);
     else printError(retVal, params);
-
+    
     pthread_mutex_unlock(&atm_mutex_);
-	printSemStatus(associated_bank_, "withdraw before 2nd wait for read");
 	sem_wait(&associated_bank_->bank_read);
 	associated_bank_->reader_count--;
-	printSemStatus(associated_bank_, "withdraw after 2nd reader advance");
 	if (associated_bank_->reader_count == 0) {
 		sem_post(&associated_bank_->bank_write);
-		printSemStatus(associated_bank_, "withdraw after write release");
 	}
 	printSemStatus(associated_bank_, "withdraw before 2nd post");	
 	sem_post(&associated_bank_->bank_read);
 	printSemStatus(associated_bank_, "withdraw after 2nd post");
-
 }
 
 //*******************************************************************************************************//
 //atm get_balance method. mark itself as Bank reader, and calls bank get_balance method and prints suitable log
 void atm::atm_get_balance (actionParams_t* params)
 {	
-	     	printSemStatus(associated_bank_, "get_balance before 1st wait for read");
+	printSemStatus(associated_bank_, "get_balance before 1st wait for read");
 	sem_wait(&associated_bank_->bank_read);
 	associated_bank_-> reader_count ++;
-    	printSemStatus(associated_bank_, "get_balance after 1st reader advance");
+   	printSemStatus(associated_bank_, "get_balance after 1st reader advance");
 	if (associated_bank_->reader_count == 1) {
 		sem_wait(&associated_bank_->bank_write);
-     		printSemStatus(associated_bank_, "get_balance after write lock");
 	}
-	printSemStatus(associated_bank_, "get_balance before 1st post");		
 	sem_post(&associated_bank_->bank_read);
-	printSemStatus(associated_bank_, "get_balance after 1st post");
-
-
     pthread_mutex_lock(&atm_mutex_);
+    
     int retVal = associated_bank_->get_balance_bank(params);
     if (GOOD_OP == retVal) printLog(BALANCE_MSG,params);
     else printError(retVal, params);
+    
     pthread_mutex_unlock(&atm_mutex_);
-
-	printSemStatus(associated_bank_, "get_balance before 2nd wait for read");
 	sem_wait(&associated_bank_->bank_read);
 	associated_bank_->reader_count--;
-	printSemStatus(associated_bank_, "get_balance after 2nd reader advance");
 	if (associated_bank_->reader_count == 0) {
 		sem_post(&associated_bank_->bank_write);
-		printSemStatus(associated_bank_, "get_balance after write release");
 	}
 	printSemStatus(associated_bank_, "get_balance before 2nd post");	
 	sem_post(&associated_bank_->bank_read);
 	printSemStatus(associated_bank_, "get_balance after 2nd post");
-
 }
 //*******************************************************************************************************//
 //atm close method. mark itself as Bank writer, and calls bank close_account method and prints suitable log
@@ -229,7 +201,7 @@ void atm::atm_close_account (actionParams_t* params)
     printSemStatus(associated_bank_, "close_account after lock");
     pthread_mutex_lock(&atm_mutex_);
 
-    int retVal = associated_bank_->get_balance_bank(params);
+    int retVal = associated_bank_->close_account_bank(params);
     if (GOOD_OP == retVal) printLog(CLOSE_MSG,params);
     else printError(retVal, params);
 
@@ -242,35 +214,26 @@ void atm::atm_close_account (actionParams_t* params)
 //*******************************************************************************************************//
 //atm transfer method. mark itself as Bank reader, and calls bank transfer method and prints suitable log
 void atm::atm_transfer_money (actionParams_t* params)
-{
+{   
    	printSemStatus(associated_bank_, "transfer before 1st wait for read");
 	sem_wait(&associated_bank_->bank_read);
 	associated_bank_-> reader_count ++;
    	printSemStatus(associated_bank_, "transfer after 1st reader advance");
 	if (associated_bank_->reader_count == 1) {
 		sem_wait(&associated_bank_->bank_write);
-     		printSemStatus(associated_bank_, "transfer after write lock");
 	}
-	printSemStatus(associated_bank_, "transfer before 1st post");		
 	sem_post(&associated_bank_->bank_read);
-	printSemStatus(associated_bank_, "transfer after 1st post");
-
     pthread_mutex_lock(&atm_mutex_);
     
     int retVal = associated_bank_->transfer_money_bank(params);
     if (GOOD_OP == retVal) printLog(TRANSFER_MSG,params);
     else printError(retVal, params);
-    
     pthread_mutex_unlock(&atm_mutex_);
-    //sem_post(&associated_bank_->bank_write);
 
-	printSemStatus(associated_bank_, "transfer before 2nd wait for read");
 	sem_wait(&associated_bank_->bank_read);
 	associated_bank_->reader_count--;
-	printSemStatus(associated_bank_, "transfer after 2nd reader advance");
 	if (associated_bank_->reader_count == 0) {
 		sem_post(&associated_bank_->bank_write);
-		printSemStatus(associated_bank_, "transfer after write release");
 	}
 	printSemStatus(associated_bank_, "transfer before 2nd post");	
 	sem_post(&associated_bank_->bank_read);

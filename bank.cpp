@@ -17,26 +17,11 @@
 
 void* bank_main_loop (void* bankPtr){
     pBank ourBank = (pBank)bankPtr;
-    int semVal;
-    int readSemVal;
     while(1){
         sleep(3);
-         if(DEBUG) cout << "Locking commision sem\n";
-        sem_getvalue(&ourBank->bank_write, &semVal);
-        sem_getvalue(&ourBank->bank_read, &readSemVal);
-         if(DEBUG)cout << "comission sem val before lock: " << semVal << "read sem val: "<< readSemVal <<"read count: " << ourBank->reader_count<< "\n";
         sem_wait(&ourBank->bank_write);
-         if(DEBUG) cout << "Locked commision sem\n";
-        sem_getvalue(&ourBank->bank_write, &semVal);
-         if(DEBUG)cout << "comission sem val after lock: " << semVal<<  "read sem val: "<< readSemVal <<"read count: " << ourBank->reader_count<< "\n";
         ourBank->take_commission();
-        sem_getvalue(&ourBank->bank_write, &semVal);
-         if(DEBUG)cout << "comission sem val befor release: " << semVal<< "read sem val: "<< readSemVal <<"read count: " << ourBank->reader_count<< "\n";
-         if(DEBUG) cout << "releasing commision sem\n";
         sem_post(&ourBank->bank_write);
-         if(DEBUG) cout << "released commision sem\n";
-        sem_getvalue(&ourBank->bank_write, &semVal);
-         if(DEBUG)cout << "comission sem val after release: " << semVal<<  "read sem val: "<< readSemVal <<"read count: " << ourBank->reader_count<< "\n";
     }
     return NULL;
 }
@@ -47,29 +32,11 @@ void* bank_main_loop (void* bankPtr){
 //*****************************************************************************************//
 void* bank_print_loop(void* bankPtr){
     pBank ourBank = (pBank)bankPtr;
-    int semVal;
-    int readSemVal;
     while(1){
 	    sleep(0.5);
-         if(DEBUG) cout << "Locking print sem\n";
-        sem_getvalue(&ourBank->bank_write, &semVal);
-        sem_getvalue(&ourBank->bank_read, &readSemVal);
-         if(DEBUG)cout << "print sem val before lock: " << semVal<<  "read sem val: "<< readSemVal <<"read count: " << ourBank->reader_count<< "\n";
         sem_wait(&ourBank->bank_write);
-        sem_getvalue(&ourBank->bank_write, &semVal);
-        sem_getvalue(&ourBank->bank_read, &readSemVal);
-         if(DEBUG)cout << "print sem val after lock: " << semVal<<  "read sem val: "<< readSemVal <<"read count: " << ourBank->reader_count<< "\n";
-         if(DEBUG) cout << "Locked print sem\n";
         ourBank->print_status();
-         if(DEBUG) cout << "releasing print sem\n";
-        sem_getvalue(&ourBank->bank_write, &semVal);
-        sem_getvalue(&ourBank->bank_read, &readSemVal);
-         if(DEBUG)cout << "print sem val before release: " << semVal<<  "read sem val: "<< readSemVal <<"read count: " << ourBank->reader_count<< "\n";
         sem_post(&ourBank->bank_write);
-        sem_getvalue(&ourBank->bank_read, &readSemVal);
-        sem_getvalue(&ourBank->bank_write, &semVal);
-         if(DEBUG)cout << "print sem val after release: " << semVal<<  "read sem val: "<< readSemVal <<"read count: " << ourBank->reader_count<< "\n";
-         if(DEBUG) cout << "released print sem\n";
     }
     return NULL;
 }
@@ -92,7 +59,7 @@ void* bank_print_loop(void* bankPtr){
 //(requires account constructor and operator=    
 	int bank::openAccount(actionParams_t *params)
 	{
-		 if(DEBUG) cout<<"inside bank open account\n";
+		if(DEBUG) cout<<"inside bank open account\n";
         if (bank_accounts_.end() == bank_accounts_.find(params->accountNum)){
             account new_account = account(params->accountNum, params->password, params->balance);
 			bank_accounts_.insert(pair<unsigned int ,account>(params->accountNum,new_account));
@@ -200,18 +167,16 @@ int bank::transfer_money_bank(actionParams_t* params){
     if(DEBUG)cout<< "before serching for dst in map\n";
     src_it = bank_accounts_.find(params->accountNum) ; //get referance pointer to account--need allocation ?
     if(DEBUG)cout << "after searching src in map\n";
-    if ((bank_accounts_.end() == src_it) || (bank_accounts_.end() == src_it)) 
-        return ACCOUNT_NOT_EXIST;                                                              	
-    else{
-        if(DEBUG)cout << "before withdraw\n";
-        params->amount = params->tranAmount;        
-        int rc = withdraw_bank(params);
-        if(DEBUG)cout << "before get money\n";
-        if(GOOD_OP != rc) return rc;
-        rc = (params->isDstBank) ? bank_account_.account_get_money(params) : tgt_it->second.account_get_money(params);
-        if(DEBUG)cout << "done transfer bank\n";
-        return rc;
-    }
+    int allAccountValid =params->isDstBank ? !(bank_accounts_.end() == src_it) : !((bank_accounts_.end() == src_it) || (bank_accounts_.end() == tgt_it));
+    if(!allAccountValid) return ACCOUNT_NOT_EXIST;
+    if(DEBUG)cout << "before withdraw\n";
+    params->amount = params->tranAmount;        
+    int rc = withdraw_bank(params);
+    if(DEBUG)cout << "before get money\n";
+    if(GOOD_OP != rc) return rc;
+    rc = (params->isDstBank) ? bank_account_.account_get_money(params) : tgt_it->second.account_get_money(params);
+    if(DEBUG)cout << "done transfer bank\n";
+    return rc;
 }
 
 
