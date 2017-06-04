@@ -8,6 +8,7 @@ using namespace std;
 #define DEBUG_MAIN 0
 int main (int argc, const char* argv[])
 {
+    //validating num of atms suitable to num of files given by the user
     cout <<"Welcome to Ahiads' & Roeis' Bank\n";
     if(argc == 1){
         cout << "No Argument sent to the Bank\n";
@@ -21,27 +22,23 @@ int main (int argc, const char* argv[])
         cout <<"Illegal Arguments : argc: "<<argc<<"argv[0]"<<atoi(argv[0]) ; 
         return -1;
     }
-    //todo: init this values; !!!
     int numOfAtm = atoi(argv[1]);
     int currentAtm=0;
     
-
+    //removing existing file and open a new one insread.
     remove("log.txt");
     ofstream logFile;
     logFile.open("log.txt");
-    logFile << "Welcome to Ahiads' & Roeis' Bank\n";
-    logFile << "The Best Bank in all The Middle East\n";
     logFile.close();
 
-    unsigned int bank_account_num = BANLK_ACCOUNT_NUM ;
-
+    //initing the Bank parameters and object
+    unsigned int bank_account_num = BANK_ACCOUNT_NUM ;
     string bank_pass = "123456"; 
     bank bank(bank_account_num,bank_pass ,0);
-    if(DEBUG_MAIN) cout << "back to main"<<"\n" ;
+
+    //create threads for each atm, printign loop and commission loop.
     pthread_t atmsThreads[numOfAtm];
 	pthread_t bankThreads[2]; //for example - i need dedicated thread for taking commison
-    if(DEBUG_MAIN) cout << "created pthreads structs"<< "\n";
-
     int rc;
     pAtmParams curAtmPar;
     for (currentAtm = 0; currentAtm < numOfAtm; currentAtm++){
@@ -68,12 +65,14 @@ int main (int argc, const char* argv[])
         cout << "ERROR creating bank" << "\n";
         exit(-1);
     }
+    //whaiting for all atms threads to be done - execute all action on files
     if(DEBUG_MAIN) cout << "debug- in main after bank threads create" << "\n" ;
     int atmWait;     
     for (atmWait = 0; atmWait < numOfAtm; atmWait++){
         pthread_join(atmsThreads[atmWait],NULL);
         if(DEBUG) cout << "Joined all threads\n";
     }
+    // canceling print and commission threads
     pthread_cancel(bankThreads[0]); 
     pthread_cancel(bankThreads[1]);
     return 0; 

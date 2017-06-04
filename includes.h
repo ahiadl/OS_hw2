@@ -56,8 +56,8 @@ class actionParams_t{
         int isDstBank;
 };
 
-#define BANLK_ACCOUNT_NUM 987889898
-#define BANLK_ACCOUNT_PASS 959595320
+#define BANK_ACCOUNT_NUM 987889898
+#define BANK_ACCOUNT_PASS 959595320
 
 #define SUCCESS 0 ;
 #define PASS_ERROR -1
