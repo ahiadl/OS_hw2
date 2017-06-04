@@ -109,7 +109,8 @@ void* bank_print_loop(void* bankPtr){
             params.tranAmount = (params.balance*rand_commison)/100;
             params.targetAccount = bank_account_num;
 			transfer_money_bank(&params);
-			logFile/*cout*/<< "Bank: commissions of " <<rand_commison<<" were charged, the bank gained "<< params.tranAmount << " $ from account " << params.accountNum << "\n";
+			if (SCREEN_PRINT) cout<< "Bank: commissions of " <<rand_commison<<" were charged, the bank gained "<< params.tranAmount << " $ from account " << params.accountNum << "\n";
+            else logFile<< "Bank: commissions of " <<rand_commison<<" were charged, the bank gained "<< params.tranAmount << " $ from account " << params.accountNum << "\n";
 	    }
         logFile.close();
 	}
@@ -119,8 +120,8 @@ void* bank_print_loop(void* bankPtr){
 void bank::print_status()
 {
     actionParams_t params;
-    printf("\033[2J");
-    printf("\033[1;1H");
+    if(!SCREEN_PRINT) printf("\033[2J");
+    if(!SCREEN_PRINT) printf("\033[1;1H");
 	printf("Current Bank Status\n");
 	for (accounts_it = bank_accounts_.begin(); accounts_it != bank_accounts_.end(); ++accounts_it)
 	{

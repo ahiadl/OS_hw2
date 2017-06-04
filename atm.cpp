@@ -7,22 +7,28 @@ void printLog(int msg_code, actionParams_t* params){
     logFile.open("log.txt",std::ios::app|std::ios::out);
     switch(msg_code){
         case OPEN_MSG:
-            logFile/*cout*/ << params->atmNum <<": New aacount id is "<< params->accountNum <<" with password "<< params->password << " and initial balance "<<params->balance <<"\n";
+            if (SCREEN_PRINT) cout << params->atmNum <<": New aacount id is "<< params->accountNum <<" with password "<< params->password << " and initial balance "<<params->balance <<"\n";
+            else logFile << params->atmNum <<": New aacount id is "<< params->accountNum <<" with password "<< params->password << " and initial balance "<<params->balance <<"\n";
             break;
         case DEPOSIT_MSG:
-            logFile/*cout*/ << params->atmNum <<": Account "<< params->accountNum <<" new balance is "<< params->balance << " after "<<params->amount << " $ was deposited\n";
+            if (SCREEN_PRINT) cout << params->atmNum <<": Account "<< params->accountNum <<" new balance is "<< params->balance << " after "<<params->amount << " $ was deposited\n";
+            else logFile << params->atmNum <<": Account "<< params->accountNum <<" new balance is "<< params->balance << " after "<<params->amount << " $ was deposited\n";
             break;
         case WITHDRAW_MSG:
-            logFile/* cout*/ << params->atmNum <<": Account "<< params->accountNum <<" new balance is "<< params->balance << " after "<<params->amount << " $ was withdrew\n";
+            if (SCREEN_PRINT) cout << params->atmNum <<": Account "<< params->accountNum <<" new balance is "<< params->balance << " after "<<params->amount << " $ was withdrew\n";
+            else logFile << params->atmNum <<": Account "<< params->accountNum <<" new balance is "<< params->balance << " after "<<params->amount << " $ was withdrew\n";
             break;
         case BALANCE_MSG:  
-            logFile/*cout*/ << params->atmNum <<": Account "<< params->accountNum <<" balance is "<< params->balance << "\n";
+            if (SCREEN_PRINT) cout << params->atmNum <<": Account "<< params->accountNum <<" balance is "<< params->balance << "\n";
+            else logFile << params->atmNum <<": Account "<< params->accountNum <<" balance is "<< params->balance << "\n";
             break;
-        case CLOSE_MSG:  
-            logFile/*cout*/ << params->atmNum <<": Account "<< params->accountNum <<"is now closed. Balance was " << params->balance <<"\n";
+        case CLOSE_MSG: 
+            if (SCREEN_PRINT) cout << params->atmNum <<": Account "<< params->accountNum <<"is now closed. Balance was " << params->balance <<"\n";
+            else logFile << params->atmNum <<": Account "<< params->accountNum <<"is now closed. Balance was " << params->balance <<"\n";
             break;
         case TRANSFER_MSG: 
-            logFile/*cout*/ << params->atmNum <<": Transfer "<< params->tranAmount <<"from account "<< params->accountNum <<" to account "<< params->targetAccount <<". new account balance is " <<params->balance <<" new target account balance "<< params->dstBalance << "\n";
+            if (SCREEN_PRINT) cout << params->atmNum <<": Transfer "<< params->tranAmount <<"from account "<< params->accountNum <<" to account "<< params->targetAccount <<". new account balance is " <<params->balance <<" new target account balance "<< params->dstBalance << "\n";
+            else logFile << params->atmNum <<": Transfer "<< params->tranAmount <<"from account "<< params->accountNum <<" to account "<< params->targetAccount <<". new account balance is " <<params->balance <<" new target account balance "<< params->dstBalance << "\n"; 
             break;
         default: break;
     }
@@ -35,16 +41,20 @@ void printError(int error_code, actionParams_t* params){
     logFile.open("log.txt",std::ios::app|std::ios::out);
     switch(error_code){
         case WRONG_PASSWORD:
-            logFile/*cout*/<<"Error " << params->atmNum <<": Your transaction failed – password for account "<< params->accountNum << " is incorrect\n";
+            if (SCREEN_PRINT) cout <<"Error " << params->atmNum <<": Your transaction failed – password for account "<< params->accountNum << " is incorrect\n";
+            else logFile << "Error " << params->atmNum <<": Your transaction failed – password for account "<< params->accountNum << " is incorrect\n";
             break;
         case ACCOUNT_NOT_EXIST:
-            logFile/*cout*/<< "Error "<< params->atmNum <<": Your transaction failed – account id "<< params->accountNum << " does not exists\n";        
+            if (SCREEN_PRINT) cout << "Error "<< params->atmNum <<": Your transaction failed – account id "<< params->accountNum << " does not exists\n";        
+            else logFile << "Error "<< params->atmNum <<": Your transaction failed – account id "<< params->accountNum << " does not exists\n";        
             break;
         case AMOUNT_ILLEGAL:
-            logFile/*cout*/ << "Error "<< params->atmNum <<": Your transaction failed – account id " << params->accountNum << " balance is lower than "<<params->amount <<"\n";
+            if (SCREEN_PRINT) cout << "Error "<< params->atmNum <<": Your transaction failed – account id " << params->accountNum << " balance is lower than "<<params->amount <<"\n";
+            else logFile << "Error "<< params->atmNum <<": Your transaction failed – account id " << params->accountNum << " balance is lower than "<<params->amount <<"\n";
             break;
         case ACCOUNT_ALRDY_EXIST:
-            logFile/*cout*/ << "Error "<< params->atmNum <<": Your transaction failed – account with the same id exists\n";
+            if (SCREEN_PRINT) cout << "Error "<< params->atmNum <<": Your transaction failed – account with the same id exists\n";
+            else logFile << "Error "<< params->atmNum <<": Your transaction failed – account with the same id exists\n";
             break;
         default: break;
     }
@@ -333,6 +343,6 @@ void* atm_main_loop(void* atmParamsLocal){//int atmNum, pBank bankInst,char cons
                 usleep(100000);
         }
         delete(actionFile);
-        cout << "Done atm loopi\n";
+        if (DEBUG) cout << "Done atm loop\n";
         return NULL;
     }
